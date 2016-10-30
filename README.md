@@ -9,6 +9,7 @@ Simple demo of hybrid cloud federation with Weave Net and Kubernetes.
 Collect cloud credentials and insert them in `secrets`.
 
 ```
+$ ssh-keygen -f k8s-test
 $ cp secrets.template secrets && $EDITOR secrets
 ```
 
@@ -55,15 +56,20 @@ Don't bother with PVs for now.
 
 Upload kubeconfigs of FRANKFURT and AMERICA to LONDON as secrets.
 
+```
+$ kubectl mumble mumble federation namespace
+```
 
 ### (5/5) Deploy app
 
-Deploy socks shop, tweaked to show where it's being served from.
+Deploy socks shop to federation apiserver, tweaked to show where it's being served from.
 
 Stateless components & caches can go everywhere.
 Only stateful components (ie basket) need to do high-latency hop.
 
 Can all components register in DNS using their Weave IPs??
+
+Aronchick wanted to show a rolling upgrade, can we do that with flux?
 
 
 ## Notes
