@@ -13,6 +13,11 @@ $ ssh-keygen -f k8s-test
 $ cp secrets.template secrets && $EDITOR secrets
 ```
 
+Do weird thing not sure why:
+```
+$ (cd CLOUD_AMERICA_GCE && terraform get)
+```
+
 ### (2/5) Use terraform to create some clusters
 
 In three terminal windows:
