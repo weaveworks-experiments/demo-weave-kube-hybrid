@@ -4,58 +4,50 @@ Simple demo of hybrid cloud federation with Weave Net and Kubernetes.
 
 ## Steps
 
+### (0/3) Prepare
+
+Collect cloud credentials and insert them in `secrets`.
+
+```
+$ cp secrets.template secrets && $EDITOR secrets
+```
+
 ### (1/3) Use terraform to create some machines
 
 In three terminal windows:
 
 ```
-$ source tokens.sh
-$ cd controlplane-do-london
-$ terraform apply
-$ ../setup_master.sh
+$ cd CLOUD_LONDON_DIGITALOCEAN && source ../secrets && terraform apply
+$ cd CLOUD_FRANKFURT_AWS && source ../secrets && terraform apply
+$ cd CLOUD_AMERICA_GCE && source ../secrets && terraform apply
 ```
 
-```
-$ source tokens.sh
-$ cd cluster-a-gce-us-central
-$ terraform apply
-$ ../setup_master.sh
-```
-
-```
-$ source tokens.sh
-$ cd cluster-b-aws-frankfurt
-$ terraform apply
-$ ../setup_master.sh
-```
-
-This should spit out IP addresses in `master` and `nodes` files in each directory.
+This should spit out IP addresses in `terraform output` for `master` and `nodes`.
 
 Get the kubeconfig files out:
 
 ```
-$ for X in controlplane-do-london cluster-a-gce-us-central cluster-b-aws-frankfurt; do
-    cd $X && scp root@`cat master`:/etc/kubernetes/admin.conf . && cd ..
+$ for X in CLOUD_*; do
+    cd $X && scp root@`terraform output master`:/etc/kubernetes/admin.conf . && cd ..
   done
 ```
 
 ### (2/3) Set up control plane
 
+Spin up control plane on DO.
+Don't bother with PV for now.
+
+Upload kubeconfigs as secrets.
 
 
-### (3/3) Deploy database on GCE
-
-```
-$ helm init ...
-$ helm deploy mysql
-```
-
-### (4/4) Deploy app
+### (3/4) Deploy app
 
 Deploy socks shop, tweaked to show where it's being served from.
 
 Stateless components & caches can go everywhere.
 Only stateful components (ie basket) need to do high-latency hop.
+
+Can all components register in DNS using their Weave IPs??
 
 
 ## Notes
