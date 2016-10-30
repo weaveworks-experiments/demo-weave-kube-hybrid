@@ -33,7 +33,7 @@ data "template_file" "node" {
   template = "${file("scripts/node.sh")}"
 
   vars {
-    token     = "${var.bootstrap_token}"
+    token     = "${var.k8s_token}"
     master-ip = "${google_compute_instance.master.network_interface.0.address}"
   }
 }

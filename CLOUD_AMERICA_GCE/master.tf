@@ -31,7 +31,7 @@ data "template_file" "master" {
   template = "${file("scripts/master.sh")}"
 
   vars {
-    token        = "${var.bootstrap_token}"
+    token        = "${var.k8s_token}"
     service-cidr = "${module.subnets.service_cidr}"
   }
 }
