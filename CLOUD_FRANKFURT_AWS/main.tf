@@ -79,7 +79,7 @@ resource "aws_route_table_association" "publicA" {
 resource "aws_subnet" "publicA" {
     vpc_id = "${aws_vpc.main.id}"
     cidr_block = "10.0.100.0/24"
-    availability_zone = "us-east-1c"
+    availability_zone = "eu-central-1b"
     map_public_ip_on_launch = true
 
     tags {

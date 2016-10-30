@@ -26,3 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 output "master_dns" {
   value = "${aws_instance.k8s-master.public_dns}"
 }
+
+output "master_ip" {
+  value = "${aws_instance.k8s-master.public_ip}"
+}
