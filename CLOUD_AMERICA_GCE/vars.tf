@@ -40,7 +40,7 @@ variable "node_machine_type" {
 //   python -c 'import random; print "%0x.%0x" % (random.SystemRandom().getrandbits(3*8), random.SystemRandom().getrandbits(8*8))'
 //
 // The token has to be in the form of '<6 chars>.<16 chars>'
-variable "bootstrap_token" {
+variable "k8s_token" {
   default = ""
 }
 
