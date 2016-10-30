@@ -23,7 +23,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-variable "k8stoken" {}
+variable "k8s_token" {}
 
 variable "aws_access_key" {
   default = ""
@@ -33,7 +33,7 @@ variable "aws_secret_key" {
   default = ""
 }
 
-variable "k8s-ssh-key" {}
+variable "k8s_ssh_key" {}
 
 variable "aws_region" {
   default = "eu-central-1"
