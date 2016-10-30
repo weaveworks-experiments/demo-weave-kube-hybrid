@@ -29,7 +29,9 @@ Get the kubeconfig files out:
 
 ```
 $ for X in CLOUD_*; do
-    cd $X && scp root@`terraform output master`:/etc/kubernetes/admin.conf . && cd ..
+    cd $X && \
+    ssh -i ../k8s-test ubuntu@`terraform output master_ip` sudo cat /etc/kubernetes/admin.conf > kubeconfig && \
+    cd ..
   done
 $ kubectl mumble mumble contexts (london, frankfurt, america)
 ```
