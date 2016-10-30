@@ -4,7 +4,7 @@ Simple demo of hybrid cloud federation with Weave Net and Kubernetes.
 
 ## Steps
 
-### (0/3) Prepare
+### (1/5) Prepare
 
 Collect cloud credentials and insert them in `secrets`.
 
@@ -12,7 +12,7 @@ Collect cloud credentials and insert them in `secrets`.
 $ cp secrets.template secrets && $EDITOR secrets
 ```
 
-### (1/3) Use terraform to create some machines
+### (2/5) Use terraform to create some clusters
 
 In three terminal windows:
 
@@ -30,17 +30,31 @@ Get the kubeconfig files out:
 $ for X in CLOUD_*; do
     cd $X && scp root@`terraform output master`:/etc/kubernetes/admin.conf . && cd ..
   done
+$ kubectl mumble mumble contexts (london, frankfurt, america)
 ```
 
-### (2/3) Set up control plane
+### (3/5) Set up Weave network spanning all clouds
+
+```
+cat weave-kube-init.yaml | sed s/PASSWORD/$WEAVE_PASSWORD \
+    | kubectl --context=london apply -f weave-kube-init.yaml
+export MEETING_POINT=`cd CLOUD_LONDON_DIGITALOCEAN && terraform output master-ip`
+for location in frankfurt america; do
+    cat weave-kube-join.yaml |sed s/MEETING_POINT/$MEETING_POINT/ \
+        | sed s/PASSWORD/$WEAVE_PASSWORD \
+        | kubectl --context=$location apply -f -
+done
+```
+
+### (4/5) Set up control plane
 
 Spin up control plane on DO.
-Don't bother with PV for now.
+Don't bother with PVs for now.
 
-Upload kubeconfigs as secrets.
+Upload kubeconfigs of FRANKFURT and AMERICA to LONDON as secrets.
 
 
-### (3/4) Deploy app
+### (5/5) Deploy app
 
 Deploy socks shop, tweaked to show where it's being served from.
 
