@@ -27,6 +27,8 @@ spec:
           command:
             - /home/weave/launch.sh
             - --password=WEAVE_PASSWORD
+            # XXX how does this interact with e.g. london going down?
+            - --ipalloc-init=observer
             - MEETING_POINT
           livenessProbe:
             initialDelaySeconds: 30
