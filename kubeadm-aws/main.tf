@@ -33,7 +33,7 @@ provider "aws" {
 # Key pair for the instances
 resource "aws_key_pair" "ssh-key" {
   key_name = "k8s"
-  public_key = "${var.k8s-ssh-key}"
+  public_key = "${var.k8s_ssh_key}"
 
   lifecycle {
     create_before_destroy = true
@@ -123,7 +123,7 @@ data "template_file" "master-userdata" {
     template = "${file("${var.master-userdata}")}"
 
     vars {
-        k8stoken = "${var.k8stoken}"
+        k8stoken = "${var.k8s_token}"
     }
 }
 
@@ -131,7 +131,7 @@ data "template_file" "worker-userdata" {
     template = "${file("${var.worker-userdata}")}"
 
     vars {
-        k8stoken = "${var.k8stoken}"
+        k8stoken = "${var.k8s_token}"
         masterIP = "${aws_instance.k8s-master.private_ip}"
     }
 }
