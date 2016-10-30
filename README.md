@@ -13,9 +13,13 @@ $ ssh-keygen -f k8s-test
 $ cp secrets.template secrets && $EDITOR secrets
 ```
 
-Do weird thing not sure why:
+Do GCE-specific setup:
 ```
-$ (cd CLOUD_AMERICA_GCE && terraform get)
+$ source ./secrets && \
+   (cd CLOUD_AMERICA_GCE && terraform get && \
+    gcloud config set project $TF_VAR_gce_project && \
+    SA_EMAIL=$(gcloud iam service-accounts --format='value(email)' create k8s-terraform)
+    gcloud iam service-accounts keys create account.json --iam-account=$SA_EMAIL)
 ```
 
 ### (2/5) Use terraform to create some clusters
@@ -58,6 +62,8 @@ done
 
 ### (4/5) Set up control plane
 
+TODO
+
 Spin up control plane on DO.
 Don't bother with PVs for now.
 
@@ -69,12 +75,15 @@ $ kubectl mumble mumble federation namespace
 
 ### (5/5) Deploy app
 
+TODO
+
 Deploy socks shop to federation apiserver, tweaked to show where it's being served from.
 
 Stateless components & caches can go everywhere.
 Only stateful components (ie basket) need to do high-latency hop.
 
 Can all components register in DNS using their Weave IPs??
+So that front-end in one cloud can securely talk to orders-service in another, for example?
 
 Aronchick wanted to show a rolling upgrade, can we do that with flux?
 
