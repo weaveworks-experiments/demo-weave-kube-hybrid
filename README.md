@@ -35,6 +35,8 @@ $ kubectl mumble mumble contexts (london, frankfurt, america)
 
 ### (3/5) Set up Weave network spanning all clouds
 
+The Weave routers will join up into a resilient hybrid cloud mesh network, given just a single meeting point IP.
+
 ```
 cat weave-kube-init.yaml | sed s/PASSWORD/$WEAVE_PASSWORD \
     | kubectl --context=london apply -f weave-kube-init.yaml

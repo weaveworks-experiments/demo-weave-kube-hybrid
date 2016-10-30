@@ -26,6 +26,8 @@ spec:
           image: weaveworks/weave-kube:1.7.2
           command:
             - /home/weave/launch.sh
+            - --password=WEAVE_PASSWORD
+            - MEETING_POINT
           livenessProbe:
             initialDelaySeconds: 30
             httpGet:
