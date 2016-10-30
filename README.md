@@ -23,9 +23,9 @@ $ (cd CLOUD_AMERICA_GCE && terraform get)
 In three terminal windows:
 
 ```
-$ cd CLOUD_LONDON_DIGITALOCEAN && source ../secrets && terraform apply
-$ cd CLOUD_FRANKFURT_AWS && source ../secrets && terraform apply
-$ cd CLOUD_AMERICA_GCE && source ../secrets && terraform apply
+$ source ./secrets && cd CLOUD_LONDON_DIGITALOCEAN && terraform apply
+$ source ./secrets && cd CLOUD_FRANKFURT_AWS && terraform apply
+$ source ./secrets && cd CLOUD_AMERICA_GCE && terraform apply
 ```
 
 This should spit out IP addresses in `terraform output` for `master` and `nodes`.
