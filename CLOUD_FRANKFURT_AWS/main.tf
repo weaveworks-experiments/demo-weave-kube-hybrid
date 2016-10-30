@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 provider "aws" {
   access_key = "${var.aws_access_key}"
   secret_key = "${var.aws_secret_key}"
-  region     = "${var.aws_region}" // must be ami-8504fdea
+  region     = "${var.aws_region}" // must be eu-central-1 because AMIs
 }
 
 # Key pair for the instances
@@ -148,7 +148,7 @@ resource "aws_instance" "k8s-master" {
   depends_on = ["aws_internet_gateway.gw"]
 
   tags {
-      Name = "[TF] k8s-master"
+      Name = "luke-hybrid-demo-k8s-master"
   }
 }
 
@@ -164,7 +164,7 @@ resource "aws_instance" "k8s-worker1" {
   depends_on = ["aws_internet_gateway.gw"]
 
   tags {
-      Name = "worker0"
+      Name = "luke-hybrid-demo-k8s-node0"
   }
 }
 
@@ -180,6 +180,6 @@ resource "aws_instance" "k8s-worker2" {
   depends_on = ["aws_internet_gateway.gw"]
 
   tags {
-      Name = "worker1"
+      Name = "luke-hybrid-demo-k8s-node1"
   }
 }
