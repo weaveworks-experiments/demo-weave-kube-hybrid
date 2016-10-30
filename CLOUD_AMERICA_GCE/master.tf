@@ -18,7 +18,7 @@
 // This script will install docker, the kubelet and configure networking on the
 // node.
 data "template_file" "prereq-master" {
-  template = "${file("scripts/prereq.sh")}"
+  template = "${file("../scripts/prereq.sh")}"
 
   vars {
     bridge-cidr = "${module.subnets.master_container_cidr}"
@@ -28,7 +28,7 @@ data "template_file" "prereq-master" {
 
 // This script will install Kubernetes on the master.
 data "template_file" "master" {
-  template = "${file("scripts/master.sh")}"
+  template = "${file("../scripts/master.sh")}"
 
   vars {
     token        = "${var.k8s_token}"
@@ -43,13 +43,13 @@ data "template_cloudinit_config" "master" {
   gzip          = true
 
   part {
-    filename     = "scripts/per-instance/10-prereq.sh"
+    filename     = "../scripts/per-instance/10-prereq.sh"
     content_type = "text/x-shellscript"
     content      = "${data.template_file.prereq-master.rendered}"
   }
 
   part {
-    filename     = "scripts/per-instance/20-master.sh"
+    filename     = "../scripts/per-instance/20-master.sh"
     content_type = "text/x-shellscript"
     content      = "${data.template_file.master.rendered}"
   }
@@ -57,7 +57,7 @@ data "template_cloudinit_config" "master" {
   // Note that this script is run per boot while the others are only run once
   // per instance.
   part {
-    filename     = "scripts/per-boot/10-iptables.sh"
+    filename     = "../scripts/per-boot/10-iptables.sh"
     content_type = "text/x-shellscript"
     content      = "${data.template_file.iptables.rendered}"
   }

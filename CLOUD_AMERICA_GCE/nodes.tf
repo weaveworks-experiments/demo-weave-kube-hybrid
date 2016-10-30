@@ -19,7 +19,7 @@
 // node.
 data "template_file" "prereq-node" {
   count    = "${var.num-nodes}"
-  template = "${file("scripts/prereq.sh")}"
+  template = "${file("../scripts/prereq.sh")}"
 
   vars {
     bridge-cidr = "${element(module.subnets.node_container_cidrs, count.index)}"
@@ -30,7 +30,7 @@ data "template_file" "prereq-node" {
 // This script will have the node join the master.  It verifies itself with the
 // token.
 data "template_file" "node" {
-  template = "${file("scripts/node.sh")}"
+  template = "${file("../scripts/node.sh")}"
 
   vars {
     token     = "${var.k8s_token}"
@@ -46,13 +46,13 @@ data "template_cloudinit_config" "node" {
   gzip          = true
 
   part {
-    filename     = "scripts/per-instance/10-prereq.sh"
+    filename     = "../scripts/per-instance/10-prereq.sh"
     content_type = "text/x-shellscript"
     content      = "${element(data.template_file.prereq-node.*.rendered, count.index)}"
   }
 
   part {
-    filename     = "scripts/per-instance/20-node.sh"
+    filename     = "../scripts/per-instance/20-node.sh"
     content_type = "text/x-shellscript"
     content      = "${data.template_file.node.rendered}"
   }
@@ -60,7 +60,7 @@ data "template_cloudinit_config" "node" {
   // Note that this script is run per boot while the others are only run once
   // per instance.
   part {
-    filename     = "scripts/per-boot/10-iptables.sh"
+    filename     = "../scripts/per-boot/10-iptables.sh"
     content_type = "text/x-shellscript"
     content      = "${data.template_file.iptables.rendered}"
   }
