@@ -73,7 +73,7 @@ resource "google_compute_route" "master" {
   dest_range             = "${module.subnets.master_container_cidr}"
   network                = "${google_compute_network.network.name}"
   next_hop_instance      = "${google_compute_instance.master.name}"
-  next_hop_instance_zone = "${var.zone}"
+  next_hop_instance_zone = "${var.gce_zone}"
   priority               = 10
 }
 
@@ -82,7 +82,7 @@ resource "google_compute_route" "master" {
 resource "google_compute_instance" "master" {
   name           = "${var.cluster-name-base}-master"
   machine_type   = "${var.master_machine_type}"
-  zone           = "${var.zone}"
+  zone           = "${var.gce_zone}"
 
   // This allows this VM to send traffic from containers without NAT.  Without
   // this set GCE will verify that traffic from a VM only comes from an IP

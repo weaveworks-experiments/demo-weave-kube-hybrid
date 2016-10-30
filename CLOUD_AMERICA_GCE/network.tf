@@ -22,7 +22,7 @@ resource "google_compute_network" "network" {
 // Create a subnet for the cluster in the region that we are running in.  Have
 // it be just for the IPs that we'll assign to hosts.
 resource "google_compute_subnetwork" "subnet" {
-  name          = "${var.cluster-name-base}-default-${var.region}"
+  name          = "${var.cluster-name-base}-default-${var.gce_region}"
   ip_cidr_range = "${module.subnets.host_cidr}"
   network       = "${google_compute_network.network.name}"
 }

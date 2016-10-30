@@ -20,6 +20,6 @@ module "subnets" {
 
 provider "google" {
   credentials = "${file("account.json")}"
-  project     = "${var.project}"
-  region      = "${var.region}"
+  project     = "${var.gce_project}"
+  region      = "${var.gce_region}"
 }

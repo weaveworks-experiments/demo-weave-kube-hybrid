@@ -16,15 +16,15 @@ variable "cluster-name-base" {
   default = "kube"
 }
 
-variable "region" {
+variable "gce_region" {
   default = "us-west1"
 }
 
-variable "zone" {
+variable "gce_zone" {
   default = "us-west1-a"
 }
 
-variable "project" {}
+variable "gce_project" {}
 
 variable "master_machine_type" {
   default = "n1-standard-1"
