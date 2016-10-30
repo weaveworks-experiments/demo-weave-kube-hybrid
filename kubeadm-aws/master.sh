@@ -11,5 +11,4 @@ systemctl start docker
 
 kubeadm init --token=${k8stoken}
 
-kubectl apply -f https://git.io/weave-kube
-daemonset "weave-net" created
+#kubectl apply -f https://git.io/weave-kube

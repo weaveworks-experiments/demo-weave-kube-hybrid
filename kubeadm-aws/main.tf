@@ -25,9 +25,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 */
 
 provider "aws" {
-  access_key = "${var.access_key}"
-  secret_key = "${var.secret_key}"
-  region     = "${var.region}"
+  access_key = "${var.aws_access_key}"
+  secret_key = "${var.aws_secret_key}"
+  region     = "${var.aws_region}" // must be ami-8504fdea
 }
 
 # Key pair for the instances
@@ -76,16 +76,6 @@ resource "aws_route_table_association" "publicA" {
     route_table_id = "${aws_route_table.r.id}"
 }
 
-resource "aws_route_table_association" "publicB" {
-    subnet_id = "${aws_subnet.publicB.id}"
-    route_table_id = "${aws_route_table.r.id}"
-}
-
-resource "aws_route_table_association" "publicC" {
-    subnet_id = "${aws_subnet.publicC.id}"
-    route_table_id = "${aws_route_table.r.id}"
-}
-
 resource "aws_subnet" "publicA" {
     vpc_id = "${aws_vpc.main.id}"
     cidr_block = "10.0.100.0/24"
@@ -94,28 +84,6 @@ resource "aws_subnet" "publicA" {
 
     tags {
         Name = "TF_PubSubnetA"
-    }
-}
-
-resource "aws_subnet" "publicB" {
-    vpc_id = "${aws_vpc.main.id}"
-    cidr_block = "10.0.101.0/24"
-    availability_zone = "us-east-1d"
-    map_public_ip_on_launch = true
-
-    tags {
-        Name = "TF_PubSubnetB"
-    }
-}
-
-resource "aws_subnet" "publicC" {
-    vpc_id = "${aws_vpc.main.id}"
-    cidr_block = "10.0.102.0/24"
-    availability_zone = "us-east-1e"
-    map_public_ip_on_launch = true
-
-    tags {
-        Name = "TF_PubSubnetC"
     }
 }
 
@@ -169,7 +137,7 @@ data "template_file" "worker-userdata" {
 }
 
 resource "aws_instance" "k8s-master" {
-  ami           = "ami-2ef48339"
+  ami           = "ami-8504fdea"
   instance_type = "t2.medium"
   subnet_id = "${aws_subnet.publicA.id}"
   user_data = "${data.template_file.master-userdata.rendered}"
@@ -185,7 +153,7 @@ resource "aws_instance" "k8s-master" {
 }
 
 resource "aws_instance" "k8s-worker1" {
-  ami           = "ami-2ef48339"
+  ami           = "ami-8504fdea"
   instance_type = "t2.medium"
   subnet_id = "${aws_subnet.publicA.id}"
   user_data = "${data.template_file.worker-userdata.rendered}"
@@ -201,7 +169,7 @@ resource "aws_instance" "k8s-worker1" {
 }
 
 resource "aws_instance" "k8s-worker2" {
-  ami           = "ami-2ef48339"
+  ami           = "ami-8504fdea"
   instance_type = "t2.medium"
   subnet_id = "${aws_subnet.publicA.id}"
   user_data = "${data.template_file.worker-userdata.rendered}"

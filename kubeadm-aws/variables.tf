@@ -25,18 +25,18 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 
 variable "k8stoken" {}
 
-variable "access_key" {
+variable "aws_access_key" {
   default = ""
 }
 
-variable "secret_key" {
+variable "aws_secret_key" {
   default = ""
 }
 
 variable "k8s-ssh-key" {}
 
-variable "region" {
-  default = "us-east-1"
+variable "aws_region" {
+  default = "eu-central-1"
 }
 
 variable "master-userdata" {
