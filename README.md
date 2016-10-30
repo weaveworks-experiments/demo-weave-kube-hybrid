@@ -39,7 +39,7 @@ Get the kubeconfig files out:
 ```
 $ for X in CLOUD_*; do
     cd $X && \
-    ssh -i ../k8s-test ubuntu@`terraform output master_ip` sudo cat /etc/kubernetes/admin.conf > kubeconfig && \
+    ssh -i ../k8s-test ubuntu@$(terraform output master_ip) sudo cat /etc/kubernetes/admin.conf > kubeconfig && \
     cd ..
   done
 $ kubectl mumble mumble contexts (london, frankfurt, america)
@@ -52,7 +52,7 @@ The Weave routers will join up into a resilient hybrid cloud mesh network, given
 ```
 cat weave-kube-init.yaml | sed s/PASSWORD/$WEAVE_PASSWORD \
     | kubectl --context=london apply -f weave-kube-init.yaml
-export MEETING_POINT=`cd CLOUD_LONDON_DIGITALOCEAN && terraform output master-ip`
+export MEETING_POINT=$(cd CLOUD_LONDON_DIGITALOCEAN && terraform output master-ip)
 for location in frankfurt america; do
     cat weave-kube-join.yaml |sed s/MEETING_POINT/$MEETING_POINT/ \
         | sed s/PASSWORD/$WEAVE_PASSWORD \
