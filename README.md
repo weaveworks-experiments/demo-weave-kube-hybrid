@@ -31,6 +31,8 @@ gcloud dns managed-zones create federation \
   --dns-name federation.com
 ```
 
+(Note to self: `https://www.googleapis.com/dns/v1/projects/k8s-demos-142718/managedZones/federation`)
+
 ### (2/5) Use terraform to create some clusters
 
 In three terminal windows:
