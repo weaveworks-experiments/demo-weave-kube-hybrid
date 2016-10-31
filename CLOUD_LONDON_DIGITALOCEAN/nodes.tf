@@ -63,4 +63,5 @@ resource "digitalocean_droplet" "node" {
   size           = "${var.master_machine_type}"
   region         = "${var.do_region}"
   ssh_keys       = ["${digitalocean_ssh_key.default.id}"]
+  user_data      = "${element(data.template_cloudinit_config.node.*.rendered, count.index)}"
 }
