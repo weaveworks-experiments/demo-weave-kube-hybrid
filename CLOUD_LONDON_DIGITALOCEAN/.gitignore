@@ -1,0 +1,5 @@
+# Terraform junk
+/.terraform/
+/terraform.tfstate*
+/terraform.tfvars
+account.json
