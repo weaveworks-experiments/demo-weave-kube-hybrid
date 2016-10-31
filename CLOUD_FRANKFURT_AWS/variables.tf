@@ -39,6 +39,8 @@ variable "aws_region" {
   default = "eu-central-1"
 }
 
+// TODO refactor this so that it uses the same scripts as jbeda's
+
 variable "master-userdata" {
     default = "master.sh"
 }
