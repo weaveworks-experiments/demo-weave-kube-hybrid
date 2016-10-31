@@ -55,7 +55,23 @@ $ for X in CLOUD_*; do
     ssh -i ../k8s-test ubuntu@$(terraform output master_ip) sudo cat /etc/kubernetes/admin.conf > kubeconfig && \
     cd ..
   done
-$ kubectl mumble mumble contexts (london, frankfurt, america)
+```
+
+Run the bundled `munge_configs.py` program to merge the kubeconfigs into one with multiple contexts:
+```
+$ python munge_configs.py && cp kubeconfig ~/.kube/config
+```
+
+You should now be able to enumerate your clusters:
+```
+$ kubectl config get-contexts
+```
+
+And list nodes in them:
+```
+$ kubectl --context=london get nodes
+$ kubectl --context=frankfurt get nodes
+$ kubectl --context=america get nodes
 ```
 
 ### (3/5) Set up Weave network spanning all clouds
