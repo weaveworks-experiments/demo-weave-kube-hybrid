@@ -28,6 +28,7 @@ for f in os.listdir("."):
         # clusters
         cluster = kubeconfig["clusters"][0].copy()
         cluster["cluster"]["server"] = "https://%s:%d" % (master_ip, API_PORT)
+        cluster["cluster"]["insecure-skip-tls-verify"] = True
         cluster["name"] = context_name
         output["clusters"].append(cluster)
         # users
