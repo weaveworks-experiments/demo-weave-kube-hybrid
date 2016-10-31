@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-provider "google" {
-  credentials = "${file("account.json")}"
-  project     = "${var.gce_project}"
-  region      = "${var.gce_region}"
+provider "digitalocean" {
+  token = "${var.do_token}"
 }

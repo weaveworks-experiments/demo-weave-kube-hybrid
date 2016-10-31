@@ -1,4 +1,4 @@
-// Copyright 2016 Joe Beda
+// Copyright 2016 Joe Beda. Modified by Luke Marsden
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,22 +16,16 @@ variable "cluster-name-base" {
   default = "kube"
 }
 
-variable "gce_region" {
-  default = "us-west1"
+variable "do_region" {
+  default = "lon1"
 }
-
-variable "gce_zone" {
-  default = "us-west1-a"
-}
-
-variable "gce_project" {}
 
 variable "master_machine_type" {
-  default = "n1-standard-1"
+  default = "2gb"
 }
 
 variable "node_machine_type" {
-  default = "n1-standard-1"
+  default = "2gb"
 }
 
 variable "k8s_token" {

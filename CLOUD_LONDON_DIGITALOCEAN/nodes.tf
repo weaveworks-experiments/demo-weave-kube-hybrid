@@ -1,4 +1,4 @@
-// Copyright 2016 Joe Beda
+// Copyright 2016 Joe Beda. Modified by Luke Marsden
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ data "template_file" "node" {
 
   vars {
     token     = "${var.k8s_token}"
-    master-ip = "${google_compute_instance.master.network_interface.0.address}"
+    master-ip = "${digitalocean_droplet.master.ipv4_address}"
   }
 }
 
@@ -56,33 +56,9 @@ data "template_cloudinit_config" "node" {
 ////////////////////////////////////////////////////////////////////////////////
 // VMs
 
-resource "google_compute_instance" "node" {
-  count          = "${var.num-nodes}"
+resource "digitalocean_droplet" "node" {
+  image          = "ubuntu-16-04-x64"
   name           = "${var.cluster-name-base}-node-${count.index}"
-  machine_type   = "${var.node_machine_type}"
-  zone           = "${var.gce_zone}"
-
-  // This allows this VM to send traffic from containers without NAT.  Without
-  // this set GCE will verify that traffic from a VM only comes from an IP
-  // assigned to that VM.
-  can_ip_forward = true
-
-  disk {
-    image = "ubuntu-os-cloud/ubuntu-1604-lts"
-    type  = "pd-ssd"
-    size  = "200"
-  }
-
-  metadata {
-    "user-data" = "${element(data.template_cloudinit_config.node.*.rendered, count.index)}"
-    "user-data-encoding" = "base64"
-    "ssh-keys" = "ubuntu:${var.k8s_ssh_key}"
-  }
-
-  network_interface {
-    network = "default"
-    access_config {
-      // Ephemeral IP
-    }
-  }
+  size           = "${var.master_machine_type}"
+  region         = "${var.do_region}"
 }

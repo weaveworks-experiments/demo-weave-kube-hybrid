@@ -1,4 +1,4 @@
-// Copyright 2016 Joe Beda
+// Copyright 2016 Joe Beda. Modified by Luke Marsden
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,32 +51,10 @@ data "template_cloudinit_config" "master" {
 
 ////////////////////////////////////////////////////////////////////////////////
 // VMs
-resource "google_compute_instance" "master" {
+
+resource "digitalocean_droplet" "master" {
+  image          = "ubuntu-16-04-x64"
   name           = "${var.cluster-name-base}-master"
-  machine_type   = "${var.master_machine_type}"
-  zone           = "${var.gce_zone}"
-
-  // This allows this VM to send traffic from containers without NAT.  Without
-  // this set GCE will verify that traffic from a VM only comes from an IP
-  // assigned to that VM.
-  can_ip_forward = true
-
-  disk {
-    image = "ubuntu-os-cloud/ubuntu-1604-lts"
-    type  = "pd-ssd"
-    size  = "200"
-  }
-
-  metadata {
-    "user-data" = "${data.template_cloudinit_config.master.rendered}"
-    "user-data-encoding" = "base64"
-    "ssh-keys" = "ubuntu:${var.k8s_ssh_key}"
-  }
-
-  network_interface {
-    network = "default"
-    access_config {
-      // Ephemeral IP
-    }
-  }
+  size           = "${var.master_machine_type}"
+  region         = "${var.do_region}"
 }
