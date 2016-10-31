@@ -11,13 +11,13 @@ We'll spin up a federated cluster across DigitalOcean in London, AWS in Frankfur
 Collect cloud credentials and insert them in `secrets`.
 
 ```
-$ ssh-keygen -f k8s-test
-$ cp secrets.template secrets && $EDITOR secrets
+ssh-keygen -f k8s-test
+cp secrets.template secrets && $EDITOR secrets
 ```
 
 Do GCE-specific setup:
 ```
-$ source ./secrets && \
+source ./secrets && \
    (cd CLOUD_AMERICA_GCE && \
     gcloud config set project $TF_VAR_gce_project && \
     SA_EMAIL=$(gcloud iam service-accounts --format='value(email)' create k8s-terraform) && \
@@ -38,9 +38,9 @@ gcloud dns managed-zones create federation \
 In three terminal windows:
 
 ```
-$ source ./secrets && cd CLOUD_LONDON_DIGITALOCEAN && terraform apply
-$ source ./secrets && cd CLOUD_FRANKFURT_AWS && terraform apply
-$ source ./secrets && cd CLOUD_AMERICA_GCE && terraform apply
+source ./secrets && cd CLOUD_LONDON_DIGITALOCEAN && terraform apply
+source ./secrets && cd CLOUD_FRANKFURT_AWS && terraform apply
+source ./secrets && cd CLOUD_AMERICA_GCE && terraform apply
 ```
 
 This should spit out IP addresses in `terraform output` for `master_ip`.
@@ -50,7 +50,7 @@ Wait a while for the clusters to come up. TODO maybe add scope here to watch the
 Get the kubeconfig files out:
 
 ```
-$ for X in CLOUD_*; do
+for X in CLOUD_*; do
     cd $X && \
     ssh -i ../k8s-test ubuntu@$(terraform output master_ip) sudo cat /etc/kubernetes/admin.conf > kubeconfig && \
     cd ..
@@ -59,19 +59,19 @@ $ for X in CLOUD_*; do
 
 Run the bundled `munge_configs.py` program to merge the kubeconfigs into one with multiple contexts:
 ```
-$ python munge_configs.py && cp kubeconfig ~/.kube/config
+python munge_configs.py && cp kubeconfig ~/.kube/config
 ```
 
 You should now be able to enumerate your clusters:
 ```
-$ kubectl config get-contexts
+kubectl config get-contexts
 ```
 
 And list nodes in them:
 ```
-$ kubectl --context=london get nodes
-$ kubectl --context=frankfurt get nodes
-$ kubectl --context=america get nodes
+kubectl --context=london get nodes
+kubectl --context=frankfurt get nodes
+kubectl --context=america get nodes
 ```
 
 ### (3/5) Set up Weave network spanning all clouds
@@ -99,7 +99,7 @@ Don't bother with PVs for now.
 Upload kubeconfigs of FRANKFURT and AMERICA to LONDON as secrets.
 
 ```
-$ kubectl mumble mumble federation namespace
+kubectl mumble mumble federation namespace
 ```
 
 ### (5/5) Deploy app
