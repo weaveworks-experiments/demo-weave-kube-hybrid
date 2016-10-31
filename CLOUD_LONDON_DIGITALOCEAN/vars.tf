@@ -16,6 +16,10 @@ variable "cluster-name-base" {
   default = "kube"
 }
 
+variable "do_token" {
+  default = "lon1"
+}
+
 variable "do_region" {
   default = "lon1"
 }

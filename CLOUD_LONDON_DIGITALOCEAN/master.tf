@@ -57,4 +57,5 @@ resource "digitalocean_droplet" "master" {
   name           = "${var.cluster-name-base}-master"
   size           = "${var.master_machine_type}"
   region         = "${var.do_region}"
+  ssh_keys       = ["${digitalocean_ssh_key.default.id}"]
 }

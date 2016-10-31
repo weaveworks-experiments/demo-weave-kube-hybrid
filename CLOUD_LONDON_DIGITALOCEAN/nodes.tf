@@ -57,8 +57,10 @@ data "template_cloudinit_config" "node" {
 // VMs
 
 resource "digitalocean_droplet" "node" {
+  count          = "${var.num-nodes}"
   image          = "ubuntu-16-04-x64"
   name           = "${var.cluster-name-base}-node-${count.index}"
   size           = "${var.master_machine_type}"
   region         = "${var.do_region}"
+  ssh_keys       = ["${digitalocean_ssh_key.default.id}"]
 }
