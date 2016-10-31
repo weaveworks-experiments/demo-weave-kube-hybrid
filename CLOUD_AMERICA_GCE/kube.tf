@@ -12,12 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module "subnets" {
-  source    = "./subnets"
-  cidr      = "${var.cidr}"
-  num-nodes = "${var.num-nodes}"
-}
-
 provider "google" {
   credentials = "${file("account.json")}"
   project     = "${var.gce_project}"

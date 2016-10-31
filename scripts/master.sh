@@ -14,6 +14,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Initialize Kubernetes.  This will allocate serice IPs out of the service-cidr
-# range.
-kubeadm init --service-cidr=${service-cidr} --token=${token}
+# Initialize Kubernetes.
+kubeadm init --token=${token}

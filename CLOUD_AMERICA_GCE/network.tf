@@ -12,25 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Create a whole new network for the Kubernetes cluster.  Make the subnets be
-// manually managed.
-resource "google_compute_network" "network" {
-  name                    = "${var.cluster-name-base}"
-  auto_create_subnetworks = false
-}
-
-// Create a subnet for the cluster in the region that we are running in.  Have
-// it be just for the IPs that we'll assign to hosts.
-resource "google_compute_subnetwork" "subnet" {
-  name          = "${var.cluster-name-base}-default-${var.gce_region}"
-  ip_cidr_range = "${module.subnets.host_cidr}"
-  network       = "${google_compute_network.network.name}"
-}
-
 // Allow all traffic between IPs on this network.
 resource "google_compute_firewall" "firewall-internal" {
   name    = "${var.cluster-name-base}-internal"
-  network = "${google_compute_network.network.name}"
+  network = "default"
 
   allow {
     protocol = "icmp"
@@ -46,13 +31,12 @@ resource "google_compute_firewall" "firewall-internal" {
     ports    = ["1-65535"]
   }
 
-  source_ranges = ["${var.cidr}"]
 }
 
 // Allow SSH (TCP port 22) traffic to reach our VMs on this network.
 resource "google_compute_firewall" "firewall-ssh" {
   name    = "${var.cluster-name-base}-ssh"
-  network = "${google_compute_network.network.name}"
+  network = "default"
 
   allow {
     protocol = "tcp"
@@ -60,15 +44,4 @@ resource "google_compute_firewall" "firewall-ssh" {
   }
 
   source_ranges = ["0.0.0.0/0"]
-}
-
-// Set up a script that will run per-boot on the VM to set up IP tables.  This
-// needs to know the overall CIDR so it can make sure that traffic not on that
-// network gets NATd as it exits GCE.
-data "template_file" "iptables" {
-  template = "${file("../scripts/set-iptables.sh")}"
-
-  vars {
-    cidr = "${var.cidr}"
-  }
 }

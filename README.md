@@ -2,6 +2,8 @@
 
 Simple demo of hybrid cloud federation with Weave Net and Kubernetes.
 
+We'll spin up a federated cluster across DigitalOcean in London, AWS in Frankfurt and GCE in America.
+
 ## Steps
 
 ### (1/5) Prepare

@@ -20,11 +20,6 @@
 data "template_file" "prereq-node" {
   count    = "${var.num-nodes}"
   template = "${file("../scripts/prereq.sh")}"
-
-  vars {
-    bridge-cidr = "${element(module.subnets.node_container_cidrs, count.index)}"
-    dns-ip      = "${module.subnets.dns_service_ip}"
-  }
 }
 
 // This script will have the node join the master.  It verifies itself with the
@@ -56,29 +51,6 @@ data "template_cloudinit_config" "node" {
     content_type = "text/x-shellscript"
     content      = "${data.template_file.node.rendered}"
   }
-
-  // Note that this script is run per boot while the others are only run once
-  // per instance.
-  part {
-    filename     = "../scripts/per-boot/10-iptables.sh"
-    content_type = "text/x-shellscript"
-    content      = "${data.template_file.iptables.rendered}"
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Networking
-
-// Set up a route per node so that all traffic to the container subnet (per
-// node) will be routed to that node.
-resource "google_compute_route" "node" {
-  count                  = "${var.num-nodes}"
-  name                   = "${var.cluster-name-base}-node-${count.index}"
-  dest_range             = "${element(module.subnets.node_container_cidrs, count.index)}"
-  network                = "${google_compute_network.network.name}"
-  next_hop_instance      = "${element(google_compute_instance.node.*.name, count.index)}"
-  next_hop_instance_zone = "${var.gce_zone}"
-  priority               = 10
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,9 +79,7 @@ resource "google_compute_instance" "node" {
   }
 
   network_interface {
-    subnetwork = "${google_compute_subnetwork.subnet.name}"
-    address    = "${element(module.subnets.node_ips, count.index)}"
-
+    network = "default"
     access_config {
       // Ephemeral IP
     }
