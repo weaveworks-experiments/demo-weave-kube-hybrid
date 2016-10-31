@@ -34,20 +34,12 @@ variable "node_machine_type" {
   default = "n1-standard-1"
 }
 
-// This token is used to establish trust between nodes in the cluster.  You can
-// generate it with the following snippet:
-//
-//   python -c 'import random; print "%0x.%0x" % (random.SystemRandom().getrandbits(3*8), random.SystemRandom().getrandbits(8*8))'
-//
-// The token has to be in the form of '<6 chars>.<16 chars>'
 variable "k8s_token" {
   default = ""
-}
-
-variable "cidr" {
-  default = "10.20.0.0/16"
 }
 
 variable "num-nodes" {
   default = 3
 }
+
+variable "k8s_ssh_key" {}
