@@ -24,6 +24,13 @@ $ source ./secrets && \
     gcloud iam service-accounts keys create account.json --iam-account=$SA_EMAIL)
 ```
 
+Set up a Google DNS Managed Zone
+```
+gcloud dns managed-zones create federation \
+  --description "Kubernetes federation testing" \
+  --dns-name federation.com
+```
+
 ### (2/5) Use terraform to create some clusters
 
 In three terminal windows:
@@ -47,13 +54,6 @@ $ for X in CLOUD_*; do
     cd ..
   done
 $ kubectl mumble mumble contexts (london, frankfurt, america)
-```
-
-Set up a Google DNS Managed Zone
-```
-gcloud dns managed-zones create federation \
-  --description "Kubernetes federation testing" \
-  --dns-name federation.com
 ```
 
 ### (3/5) Set up Weave network spanning all clouds
