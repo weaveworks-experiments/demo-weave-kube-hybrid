@@ -24,7 +24,7 @@ $ source ./secrets && \
     gcloud iam service-accounts keys create account.json --iam-account=$SA_EMAIL)
 ```
 
-Set up a Google DNS Managed Zone
+Set up a Google DNS Managed Zone (you'll need your own domain for this bit).
 ```
 gcloud dns managed-zones create federation \
   --description "Kubernetes federation testing" \
