@@ -34,7 +34,9 @@ $ source ./secrets && cd CLOUD_FRANKFURT_AWS && terraform apply
 $ source ./secrets && cd CLOUD_AMERICA_GCE && terraform apply
 ```
 
-This should spit out IP addresses in `terraform output` for `master` and `nodes`.
+This should spit out IP addresses in `terraform output` for `master_ip`.
+
+Wait a while for the clusters to come up. TODO maybe add scope here to watch them come up?
 
 Get the kubeconfig files out:
 
@@ -45,6 +47,13 @@ $ for X in CLOUD_*; do
     cd ..
   done
 $ kubectl mumble mumble contexts (london, frankfurt, america)
+```
+
+Set up a Google DNS Managed Zone
+```
+gcloud dns managed-zones create federation \
+  --description "Kubernetes federation testing" \
+  --dns-name federation.com
 ```
 
 ### (3/5) Set up Weave network spanning all clouds
