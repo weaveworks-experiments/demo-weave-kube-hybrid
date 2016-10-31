@@ -52,7 +52,7 @@ Get the kubeconfig files out:
 ```
 for X in CLOUD_*; do
   cd $X && \
-  ssh -i ../k8s-test ubuntu@$(terraform output master_ip) \
+  ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
     sudo cat /etc/kubernetes/admin.conf > kubeconfig && \
   cd ..
 done
