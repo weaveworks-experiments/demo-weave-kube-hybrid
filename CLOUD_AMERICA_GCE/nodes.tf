@@ -76,6 +76,7 @@ resource "google_compute_instance" "node" {
   metadata {
     "user-data" = "${element(data.template_cloudinit_config.node.*.rendered, count.index)}"
     "user-data-encoding" = "base64"
+    "ssh-keys" = "ubuntu:${var.k8s_ssh_key}"
   }
 
   network_interface {

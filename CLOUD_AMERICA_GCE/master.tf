@@ -70,7 +70,8 @@ resource "google_compute_instance" "master" {
   metadata {
     "user-data" = "${data.template_cloudinit_config.master.rendered}"
     "user-data-encoding" = "base64"
-}
+    "ssh-keys" = "ubuntu:${var.k8s_ssh_key}"
+  }
 
   network_interface {
     network = "default"

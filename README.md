@@ -18,7 +18,7 @@ $ cp secrets.template secrets && $EDITOR secrets
 Do GCE-specific setup:
 ```
 $ source ./secrets && \
-   (cd CLOUD_AMERICA_GCE && terraform get && \
+   (cd CLOUD_AMERICA_GCE && \
     gcloud config set project $TF_VAR_gce_project && \
     SA_EMAIL=$(gcloud iam service-accounts --format='value(email)' create k8s-terraform)
     gcloud iam service-accounts keys create account.json --iam-account=$SA_EMAIL)
