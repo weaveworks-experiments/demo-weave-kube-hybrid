@@ -77,13 +77,9 @@ kubectl --context=america get nodes
 
 The Weave routers will join up into a resilient hybrid cloud mesh network, given just a single meeting point IP.
 
-Load the secrets:
-```
-source ./secrets
-```
-
 Set up the network on the federated control plane cluster (london) first:
 ```
+source ./secrets
 cat weave-kube-init.yaml | sed s/WEAVE_PASSWORD/$WEAVE_SECRET/ \
     | kubectl --context=london apply -f weave-kube-init.yaml
 ```
@@ -94,9 +90,10 @@ export MEETING_POINT=$(cd CLOUD_LONDON_DIGITALOCEAN && terraform output master_i
 
 Then join the other two locations up to the first cluster:
 ```
+source ./secrets
 for location in frankfurt america; do
     cat weave-kube-join.yaml |sed s/MEETING_POINT/$MEETING_POINT/ \
-        | sed s/PASSWORD/$WEAVE_SECRET/ \
+        | sed s/WEAVE_PASSWORD/$WEAVE_SECRET/ \
         | kubectl --context=$location apply -f -
 done
 ```
