@@ -141,6 +141,13 @@ So that front-end in one cloud can securely talk to orders-service in another, f
 
 Aronchick wanted to show a rolling upgrade, can we do that with flux?
 
+### Destroying everything
+
+```
+for X in CLOUD_*; do
+  (cd $X; terraform destroy -force)
+done
+```
 
 ## Notes
 
