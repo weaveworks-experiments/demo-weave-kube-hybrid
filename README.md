@@ -128,7 +128,8 @@ kubectl --context=london create -f config/services/federation-apiserver.yaml
 
 Configure a token for the federated API server:
 ```
-echo "$(python -c 'import random; print "%0x.%0x" % (random.SystemRandom().getrandbits(3*8), random.SystemRandom().getrandbits(8*8))'),admin,admin" > known-tokens.csv
+echo "$(python -c 'import random; print "%0x" % (random.SystemRandom().getrandbits(16*8),)'),admin,admin" \
+  > known-tokens.csv
 ```
 
 
