@@ -81,7 +81,7 @@ Set up the network on the federated control plane cluster (london) first:
 ```
 source ./secrets
 cat weave-kube-init.yaml | sed s/WEAVE_PASSWORD/$WEAVE_SECRET/ \
-    | kubectl --context=london apply -f weave-kube-init.yaml
+    | kubectl --context=london apply -f -
 ```
 Remember the IP of the master there. Note that this is only used for bootstrapping, once the Weave network has come up this will stop being a single point of failure.
 ```
