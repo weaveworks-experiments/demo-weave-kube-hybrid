@@ -78,11 +78,19 @@ kubectl --context=america get nodes
 ### (3/5) Set up Weave network spanning all clouds
 
 The Weave routers will join up into a resilient hybrid cloud mesh network, given just a single meeting point IP.
+Set up the network on the federated control plane cluster (london) first:
 
 ```
 cat weave-kube-init.yaml | sed s/PASSWORD/$WEAVE_SECRET/ \
     | kubectl --context=london apply -f weave-kube-init.yaml
+```
+Remember the IP of the master there. Note that this is only used for bootstrapping, once the Weave network has come up this will stop being a single point of failure.
+```
 export MEETING_POINT=$(cd CLOUD_LONDON_DIGITALOCEAN && terraform output master_ip)
+```
+
+Then join the other two locations up to the first cluster:
+```
 for location in frankfurt america; do
     cat weave-kube-join.yaml |sed s/MEETING_POINT/$MEETING_POINT/ \
         | sed s/PASSWORD/$WEAVE_SECRET/ \
@@ -93,8 +101,7 @@ done
 To check that the network came up across 3 clouds, first install the weave script on the hosts, for easy status-checking:
 ```
 for X in CLOUD_*; do
-  (cd $X;
-   ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
+  (cd $X; ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
     "sudo curl -L git.io/weave -o /usr/local/bin/weave && \
      sudo chmod +x /usr/local/bin/weave")
 done
@@ -102,8 +109,7 @@ done
 Then run status:
 ```
 for X in CLOUD_*; do
-  (cd $X;
-   ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
+  (cd $X; ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
     "sudo weave status")
 done
 ```
