@@ -90,14 +90,21 @@ for location in frankfurt america; do
 done
 ```
 
-To check that the network came up across 3 clouds:
+To check that the network came up across 3 clouds, first install the weave script on the hosts, for easy status-checking:
 ```
 for X in CLOUD_*; do
   (cd $X;
    ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
     "sudo curl -L git.io/weave -o /usr/local/bin/weave && \
-     sudo chmod +x /usr/local/bin/weave && \
-     sudo weave status")
+     sudo chmod +x /usr/local/bin/weave")
+done
+```
+Then run status:
+```
+for X in CLOUD_*; do
+  (cd $X;
+   ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
+    "sudo weave status")
 done
 ```
 
