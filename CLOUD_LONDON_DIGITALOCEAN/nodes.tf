@@ -15,42 +15,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Start up scripts
 
-// This script will install docker, the kubelet and configure networking on the
-// node.
-data "template_file" "prereq-node" {
-  count    = "${var.num-nodes}"
-  template = "${file("../scripts/prereq.sh")}"
-}
+data "template_file" "worker-userdata" {
+    template = "${file("${var.worker-userdata}")}"
 
-// This script will have the node join the master.  It verifies itself with the
-// token.
-data "template_file" "node" {
-  template = "${file("../scripts/node.sh")}"
-
-  vars {
-    token     = "${var.k8s_token}"
-    master-ip = "${digitalocean_droplet.master.ipv4_address}"
-  }
-}
-
-// Package all of this up in to one base64 encoded string so that cloud init in
-// the VM can run these scripts once booted.
-data "template_cloudinit_config" "node" {
-  count         = "${var.num-nodes}"
-  base64_encode = true
-  gzip          = true
-
-  part {
-    filename     = "../scripts/per-instance/10-prereq.sh"
-    content_type = "text/x-shellscript"
-    content      = "${element(data.template_file.prereq-node.*.rendered, count.index)}"
-  }
-
-  part {
-    filename     = "../scripts/per-instance/20-node.sh"
-    content_type = "text/x-shellscript"
-    content      = "${data.template_file.node.rendered}"
-  }
+    vars {
+        k8stoken = "${var.k8s_token}"
+        masterIP = "${digitalocean_droplet.master.ipv4_address}"
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,5 +34,5 @@ resource "digitalocean_droplet" "node" {
   size           = "${var.master_machine_type}"
   region         = "${var.do_region}"
   ssh_keys       = ["${digitalocean_ssh_key.default.id}"]
-  user_data      = "${element(data.template_cloudinit_config.node.*.rendered, count.index)}"
+  user_data      = "${element(data.template_file.worker-userdata.*.rendered, count.index)}"
 }

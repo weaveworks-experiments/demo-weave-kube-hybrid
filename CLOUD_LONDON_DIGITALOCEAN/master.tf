@@ -17,36 +17,12 @@
 
 // This script will install docker, the kubelet and configure networking on the
 // node.
-data "template_file" "prereq-master" {
-  template = "${file("../scripts/prereq.sh")}"
-}
+data "template_file" "master-userdata" {
+    template = "${file("${var.master-userdata}")}"
 
-// This script will install Kubernetes on the master.
-data "template_file" "master" {
-  template = "${file("../scripts/master.sh")}"
-
-  vars {
-    token        = "${var.k8s_token}"
-  }
-}
-
-// Package all of this up in to one base64 encoded string so that cloud init in
-// the VM can run these scripts once booted.
-data "template_cloudinit_config" "master" {
-  base64_encode = true
-  gzip          = true
-
-  part {
-    filename     = "../scripts/per-instance/10-prereq.sh"
-    content_type = "text/x-shellscript"
-    content      = "${data.template_file.prereq-master.rendered}"
-  }
-
-  part {
-    filename     = "../scripts/per-instance/20-master.sh"
-    content_type = "text/x-shellscript"
-    content      = "${data.template_file.master.rendered}"
-  }
+    vars {
+        k8stoken = "${var.k8s_token}"
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,5 +34,5 @@ resource "digitalocean_droplet" "master" {
   size           = "${var.master_machine_type}"
   region         = "${var.do_region}"
   ssh_keys       = ["${digitalocean_ssh_key.default.id}"]
-  user_data      = "${data.template_cloudinit_config.master.rendered}"
+  user_data      = "${data.template_file.master-userdata.rendered}"
 }

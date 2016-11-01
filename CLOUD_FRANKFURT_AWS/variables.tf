@@ -39,12 +39,12 @@ variable "aws_region" {
   default = "eu-central-1"
 }
 
-// TODO refactor this so that it uses the same scripts as jbeda's
+// TODO refactor this so that it uses the same scripts as jbeda's (actually, make jbeda's use ours)
 
 variable "master-userdata" {
-    default = "master.sh"
+    default = "../scripts/master-combined.sh"
 }
 
 variable "worker-userdata" {
-    default = "worker.sh"
+    default = "../scripts/node-combined.sh"
 }
