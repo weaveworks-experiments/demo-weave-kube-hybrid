@@ -116,6 +116,22 @@ done
 
 ### (4/5) Set up control plane
 
+The Kubernetes federation control plane will run in the federation namespace. Create the federation namespace using kubectl:
+```
+kubectl --context=london create -f config/ns/federation.yaml
+```
+
+Now create a service for the federated API server, it will use a NodePort on static port 30443 on all nodes in London.
+```
+kubectl --context=london create -f config/services/federation-apiserver.yaml
+```
+
+Configure a token for the federated API server:
+```
+echo "$(python -c 'import random; print "%0x.%0x" % (random.SystemRandom().getrandbits(3*8), random.SystemRandom().getrandbits(8*8))'),admin,admin" > known-tokens.csv
+```
+
+
 TODO
 
 Spin up control plane on DO.
