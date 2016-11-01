@@ -82,7 +82,7 @@ The Weave routers will join up into a resilient hybrid cloud mesh network, given
 ```
 cat weave-kube-init.yaml | sed s/PASSWORD/$WEAVE_SECRET/ \
     | kubectl --context=london apply -f weave-kube-init.yaml
-export MEETING_POINT=$(cd CLOUD_LONDON_DIGITALOCEAN && terraform output master-ip)
+export MEETING_POINT=$(cd CLOUD_LONDON_DIGITALOCEAN && terraform output master_ip)
 for location in frankfurt america; do
     cat weave-kube-join.yaml |sed s/MEETING_POINT/$MEETING_POINT/ \
         | sed s/PASSWORD/$WEAVE_SECRET/ \
