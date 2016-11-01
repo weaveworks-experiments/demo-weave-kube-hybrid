@@ -133,6 +133,15 @@ echo "$(python -c \
        ),admin,admin"  > known-tokens.csv
 ```
 
+Save known-tokens.csv in Kubernetes secret in federated control plane:
+
+```
+kubectl --context=london --namespace=federation \
+  create secret generic federation-apiserver-secrets --from-file=known-hosts
+kubectl --context=london --namespace=federation \
+  describe secrets federation-apiserver-secrets
+```
+
 
 TODO
 
