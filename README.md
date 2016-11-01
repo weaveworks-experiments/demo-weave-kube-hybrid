@@ -137,7 +137,7 @@ Save known-tokens.csv in Kubernetes secret in federated control plane:
 
 ```
 kubectl --context=london --namespace=federation \
-  create secret generic federation-apiserver-secrets --from-file=known-hosts.csv
+  create secret generic federation-apiserver-secrets --from-file=known-tokens.csv
 kubectl --context=london --namespace=federation \
   describe secrets federation-apiserver-secrets
 ```
