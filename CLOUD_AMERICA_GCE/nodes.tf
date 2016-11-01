@@ -17,16 +17,41 @@
 
 // This script will install docker, the kubelet and configure networking on the
 // node.
-
-data "template_file" "worker-userdata" {
-    template = "${file("${var.worker-userdata}")}"
-
-    vars {
-        k8stoken = "${var.k8s_token}"
-        masterIP = "${google_compute_instance.master.network_interface.0.address}"
-    }
+data "template_file" "prereq-node" {
+  count    = "${var.num-nodes}"
+  template = "${file("../scripts/prereq.sh")}"
 }
 
+// This script will have the node join the master.  It verifies itself with the
+// token.
+data "template_file" "node" {
+  template = "${file("../scripts/node.sh")}"
+
+  vars {
+    token     = "${var.k8s_token}"
+    master-ip = "${google_compute_instance.master.network_interface.0.address}"
+  }
+}
+
+// Package all of this up in to one base64 encoded string so that cloud init in
+// the VM can run these scripts once booted.
+data "template_cloudinit_config" "node" {
+  count         = "${var.num-nodes}"
+  base64_encode = true
+  gzip          = true
+
+  part {
+    filename     = "../scripts/per-instance/10-prereq.sh"
+    content_type = "text/x-shellscript"
+    content      = "${element(data.template_file.prereq-node.*.rendered, count.index)}"
+  }
+
+  part {
+    filename     = "../scripts/per-instance/20-node.sh"
+    content_type = "text/x-shellscript"
+    content      = "${data.template_file.node.rendered}"
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // VMs
@@ -49,7 +74,7 @@ resource "google_compute_instance" "node" {
   }
 
   metadata {
-    "user-data" = "${element(data.template_file.worker-userdata.*.rendered, count.index)}"
+    "user-data" = "${element(data.template_cloudinit_config.node.*.rendered, count.index)}"
     "user-data-encoding" = "base64"
     "ssh-keys" = "ubuntu:${var.k8s_ssh_key}"
   }

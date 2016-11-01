@@ -43,11 +43,3 @@ variable "num-nodes" {
 }
 
 variable "k8s_ssh_key" {}
-
-variable "master-userdata" {
-    default = "../scripts/master-combined.sh"
-}
-
-variable "worker-userdata" {
-    default = "../scripts/node-combined.sh"
-}
