@@ -93,10 +93,11 @@ done
 To check that the network came up across 3 clouds:
 ```
 for X in CLOUD_*; do
-  ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
+  (cd $X;
+   ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
     "sudo curl -L git.io/weave -o /usr/local/bin/weave && \
      sudo chmod +x /usr/local/bin/weave && \
-     weave status"
+     weave status")
 done
 ```
 
