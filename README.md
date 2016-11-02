@@ -149,6 +149,9 @@ FEDERATION_CLUSTER_TOKEN=$(cut -d"," -f1 known-tokens.csv)
 ```
 Create a new kubectl context for it in our local kubeconfig (`~/.kube/config`):
 ```
+kubectl config set-cluster federation-cluster \
+  --server=https://$(cd CLUSTER_LONDON_DIGITALOCEAN; terraform output master_ip):30443 \
+  --insecure-skip-tls-verify=true
 kubectl config set-credentials federation-cluster \
   --token=${FEDERATION_CLUSTER_TOKEN}
 kubectl config set-context federation-cluster \
