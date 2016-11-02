@@ -98,7 +98,7 @@ cat weave-kube-init.yaml | sed s/WEAVE_PASSWORD/$WEAVE_SECRET/ \
 ```
 Remember the IP of the master there. Note that this is only used for bootstrapping, once the Weave network has come up this will stop being a single point of failure.
 ```
-export MEETING_POINT=$(cd CLOUD_GCE_AMERICA && terraform output master_ip)
+export MEETING_POINT=$(cd CLOUD_AMERICA_GCE && terraform output master_ip)
 ```
 
 Then join the other two locations up to the first cluster:
