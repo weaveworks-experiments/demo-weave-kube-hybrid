@@ -167,6 +167,17 @@ mkdir -p kubeconfigs
 kubectl config view --flatten --minify > kubeconfigs/federation-apiserver
 ```
 
+Create a secret for the federation control plane's kubeconfig:
+```
+kubectl --context="london" \
+  --namespace=federation \
+  create secret generic federation-apiserver-kubeconfig \
+  --from-file=kubeconfigs/federation-apiserver
+kubectl --context="london" \
+  --namespace=federation \
+  describe secrets federation-apiserver-kubeconfig # XXX it's not clear what uses this
+```
+
 Upload kubeconfigs of FRANKFURT and AMERICA to LONDON as secrets.
 ```
 kubectl mumble mumble federation namespace
