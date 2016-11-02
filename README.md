@@ -140,13 +140,8 @@ kubectl --context=london --namespace=federation \
 The federated API server will use a NodePort on static port 30443 on all nodes in London with token auth.
 Now deploy federated API service and federated API/controller-manager deployments:
 ```
-kubectl --context=london apply -f config/services config/deployments
+kubectl --context=london apply -f config/services -f config/deployments
 ```
-
-TODO
-
-Spin up control plane on DO.
-Don't bother with PVs for now.
 
 Upload kubeconfigs of FRANKFURT and AMERICA to LONDON as secrets.
 
