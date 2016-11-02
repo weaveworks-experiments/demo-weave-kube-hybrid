@@ -134,9 +134,9 @@ Save known-tokens.csv in Kubernetes secret in federated control plane:
 
 ```
 kubectl --context=america --namespace=federation \
-  create secret generic federation-apiserver-secrets --from-file=known-tokens.csv
+  create secret generic federation-apiserver-secret --from-file=known-tokens.csv
 kubectl --context=america --namespace=federation \
-  describe secrets federation-apiserver-secrets
+  describe secrets federation-apiserver-secret
 ```
 
 The federated API server will use a NodePort on static port 30443 on all nodes in America with token auth.
