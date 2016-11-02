@@ -60,7 +60,8 @@ for f in os.listdir("."):
         context = dict(context=dict(cluster=context_name, user="admin-%s" % (context_name,)), name=context_name)
         output["contexts"].append(context)
         this_kubeconfig["contexts"].append(context)
-        f = open("kubeconfigs/%s" % (context_name,), "w")
+	os.makedirs("kubeconfigs/%s" % (context_name,))
+        f = open("kubeconfigs/%s/kubeconfig" % (context_name,), "w")
         f.write(yaml.dump(this_kubeconfig))
         f.close()
 	this_cluster["metadata"]["name"] = context_name

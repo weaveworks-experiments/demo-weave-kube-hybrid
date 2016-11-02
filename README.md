@@ -164,26 +164,25 @@ kubectl config set-context federation-cluster \
   --cluster=federation-cluster \
   --user=federation-cluster
 kubectl config use-context federation-cluster
-mkdir -p kubeconfigs
-kubectl config view --flatten --minify > kubeconfigs/federation-apiserver
+mkdir -p kubeconfigs/federation-apiserver
+kubectl config view --flatten --minify > kubeconfigs/federation-apiserver/kubeconfig
 ```
 
 Create a secret for the federation control plane's kubeconfig:
 ```
-kubectl --context="america" \
-  --namespace=federation \
+kubectl --context="america" --namespace=federation \
   create secret generic federation-apiserver-kubeconfig \
-  --from-file=kubeconfigs/federation-apiserver
+  --from-file=kubeconfigs/federation-apiserver/kubeconfig
 kubectl --context="america" \
   --namespace=federation \
-  describe secrets federation-apiserver-kubeconfig # XXX it's not clear what uses this
+  describe secrets federation-apiserver-kubeconfig
 ```
 
 Upload kubeconfigs of frankfurt and london to america as secrets.
 
 ```
 for X in london frankfurt; do
-  kubectl --context=america --namespace=federation create secret generic $X --from-file=kubeconfigs/$X
+  kubectl --context=america --namespace=federation create secret generic $X --from-file=kubeconfigs/$X/kubeconfig
   kubectl --context=federation-cluster create -f config/clusters/$X.yaml
 done
 ```
