@@ -30,6 +30,8 @@ cluster_template = {
 output = copy.deepcopy(output_template)
 if not os.path.exists("kubeconfigs"):
     os.makedirs("kubeconfigs")
+if not os.path.exists("config/clusters"):
+    os.makedirs("config/clusters")
 API_PORT = 443 # change this when upgrading to -unstable kubeadm
 for f in os.listdir("."):
     if f.startswith("CLOUD_"):
