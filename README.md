@@ -19,16 +19,18 @@ Do GCE-specific setup:
 ```
 source ./secrets && \
    (cd CLOUD_AMERICA_GCE && \
-    gcloud config set project $TF_VAR_gce_project && \
-    SA_EMAIL=$(gcloud iam service-accounts --format='value(email)' create k8s-terraform) && \
-    gcloud iam service-accounts keys create account.json --iam-account=$SA_EMAIL)
+    gcloud config set project $TF_VAR_gce_project ; \
+    SA_EMAIL=$(gcloud iam service-accounts --format='value(email)' create k8s-terraform-ilya) && \
+    gcloud iam service-accounts keys create account.json --iam-account=$SA_EMAIL && \
+    PROJECT=$(gcloud config list core/project --format='value(core.project)') && \
+    gcloud projects add-iam-policy-binding $PROJECT --member serviceAccount:$SA_EMAIL --role roles/editor)
 ```
 
 Set up a Google DNS Managed Zone (you'll need your own domain for this bit).
 ```
 gcloud dns managed-zones create federation \
   --description "Kubernetes federation testing" \
-  --dns-name federation.com
+  --dns-name cluster.world
 ```
 
 (Note to self: `https://www.googleapis.com/dns/v1/projects/k8s-demos-142718/managedZones/federation`)
