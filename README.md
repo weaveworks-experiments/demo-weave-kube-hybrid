@@ -49,14 +49,16 @@ gcloud dns managed-zones create federation \
 In three terminal windows:
 
 ```
-source ./secrets && cd CLOUD_LONDON_DIGITALOCEAN && terraform apply
-source ./secrets && cd CLOUD_FRANKFURT_AWS && terraform apply
-source ./secrets && cd CLOUD_AMERICA_GCE && terraform apply
+source ./secrets && (cd CLOUD_LONDON_DIGITALOCEAN && terraform apply)
+source ./secrets && (cd CLOUD_FRANKFURT_AWS && terraform apply)
+source ./secrets && (cd CLOUD_AMERICA_GCE && terraform apply)
 ```
 
 This should spit out IP addresses in `terraform output` for `master_ip`.
 
 Wait a while for the clusters to come up. TODO maybe add scope here to watch them come up?
+
+**You'll only need one terminal window for the rest of these instructions.**
 
 Get the kubeconfig files out:
 
