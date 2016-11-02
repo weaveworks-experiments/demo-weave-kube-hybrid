@@ -64,9 +64,9 @@ for f in os.listdir("."):
         f.write(yaml.dump(this_kubeconfig))
         f.close()
 	this_cluster["metadata"]["name"] = context_name
-	this_cluster["spec"]["secretRef"] = context_name
+	this_cluster["spec"]["secretRef"]["name"] = context_name
 	this_cluster["spec"]["serverAddressByClientCIDRs"][0]["serverAddress"] = "https://%s:%d" % (master_ip, API_PORT)
-        f = open("config/clusters/%s" % (context_name,), "w")
+        f = open("config/clusters/%s.yaml" % (context_name,), "w")
         f.write(yaml.dump(this_cluster))
         f.close()
 f = open("kubeconfig", "w")
