@@ -118,12 +118,7 @@ done
 
 The Kubernetes federation control plane will run in the federation namespace. Create the federation namespace using kubectl:
 ```
-kubectl --context=london create -f config/ns/federation.yaml
-```
-
-Now create a service for the federated API server, it will use a NodePort on static port 30443 on all nodes in London.
-```
-kubectl --context=london create -f config/services/federation-apiserver.yaml
+kubectl --context=london apply -f config/ns/federation.yaml
 ```
 
 Configure a token for the federated API server:
@@ -142,6 +137,11 @@ kubectl --context=london --namespace=federation \
   describe secrets federation-apiserver-secrets
 ```
 
+The federated API server will use a NodePort on static port 30443 on all nodes in London with token auth.
+Now deploy federated API service and federated API/controller-manager deployments:
+```
+kubectl --context=london apply -f config/services config/deployments
+```
 
 TODO
 

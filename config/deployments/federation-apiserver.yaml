@@ -1,0 +1,57 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: federation-apiserver
+  namespace: federation
+  labels:
+    app: federated-cluster
+spec:
+  template:
+    metadata:
+      name: federation-apiserver
+      labels:
+        app: federated-cluster
+        module: federation-apiserver
+    spec:
+      containers:
+      - name: apiserver
+        image: gcr.io/google_containers/hyperkube-amd64:v1.4.0
+        command:
+          - /hyperkube
+          - federation-apiserver
+          - --bind-address=0.0.0.0
+          - --etcd-servers=http://localhost:2379
+          - --service-cluster-ip-range=10.10.0.0/24
+          - --secure-port=443
+          # Maybe we don't need to set advertise-address, because this is
+          # running in a container and it's only important that it binds to the
+          # pod IP. NodePort should route to it from the outside, and kube-dns
+          # should make it accessible to the federated controller-manager.
+          # - --advertise-address=ADVERTISE_ADDRESS
+          - --token-auth-file=/srv/kubernetes/known-tokens.csv
+        ports:
+          - containerPort: 443
+            name: https
+          - containerPort: 8080
+            name: local
+        volumeMounts:
+          - name: federation-apiserver-secrets
+            mountPath: /srv/kubernetes/
+            readOnly: true
+      - name: etcd
+        image: quay.io/coreos/etcd:v3.0.7
+        command:
+          - "/usr/local/bin/etcd"
+        args:
+          - "--data-dir=/var/lib/etcd"
+        volumeMounts:
+          - name: etcd-data
+            mountPath: /var/lib/etcd
+      volumes:
+        - name: federation-apiserver-secrets
+          secret:
+            secretName: federation-apiserver-secrets
+        - name: etcd-data 
+          # XXX This means federated etcd state gets destroyed if the pod gets
+          # rescheduled.
+          emptyDir: {}
