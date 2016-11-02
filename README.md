@@ -4,6 +4,15 @@ Simple demo of hybrid cloud federation with Weave Net and Kubernetes.
 
 We'll spin up a federated cluster across DigitalOcean in London, AWS in Frankfurt and GCE in America.
 
+## Prerequisites
+
+* [Terraform](https://terraform.io) 0.7.8+
+* Python 2.7 with yaml module
+* Bash
+* Cloud provider credentials for GCE, AWS and DigitalOcean.
+
+Tested on OS X, should also work on Linux.
+
 ## Steps
 
 ### (1/5) Prepare
