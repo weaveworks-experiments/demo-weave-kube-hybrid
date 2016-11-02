@@ -85,4 +85,16 @@ resource "google_compute_instance" "node" {
       // Ephemeral IP
     }
   }
+
+  service_account {
+    scopes = [
+      "cloud-platform",
+      "storage-ro",
+      "logging-write",
+      "monitoring-write",
+      "service-control",
+      "service-management",
+      "https://www.googleapis.com/auth/ndev.clouddns.readwrite",
+    ]
+  }
 }

@@ -148,9 +148,6 @@ $EDITOR config/deployments/federation-controller-manager.yaml
 kubectl --context=america apply -f config/services -f config/deployments
 ```
 
-**Now configure the IAM roles on your GCE nodes so that they have write access to your domain name in Google Cloud
-DNS.**
-
 Remind ourselves of the token we created earlier:
 ```
 FEDERATION_CLUSTER_TOKEN=$(cut -d"," -f1 known-tokens.csv)
@@ -182,10 +179,19 @@ kubectl --context="america" \
   describe secrets federation-apiserver-kubeconfig # XXX it's not clear what uses this
 ```
 
-Upload kubeconfigs of FRANKFURT and AMERICA to LONDON as secrets.
+Upload kubeconfigs of frankfurt and london to america as secrets.
+
 ```
-kubectl mumble mumble federation namespace
+for X in london frankfurt; do
+  kubectl --context=america --namespace=federation create secret generic $X --from-file=kubeconfigs/$X
+  kubectl --context=federation-cluster create -f config/clusters/$X.yaml
+done
 ```
+
+```
+kubectl --context=federation-cluster get clusters
+```
+
 
 ### (5/5) Deploy app
 

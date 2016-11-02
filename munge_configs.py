@@ -16,6 +16,18 @@ output_template = {
     "users": [],
     "contexts": [],
 }
+cluster_template = {
+    "apiVersion": "federation/v1beta1",
+    "kind": "Cluster",
+    "metadata": {"name": ""},
+    "spec": {
+      "serverAddressByClientCIDRs": [{
+	"clientCIDR": "0.0.0.0/0",
+	"serverAddress": "",
+      ]},
+      "secretRef": {"name": ""}
+    }
+}
 output = output_template.copy()
 if not os.path.exists("kubeconfigs"):
     os.makedirs("kubeconfigs")
@@ -23,6 +35,7 @@ API_PORT = 443 # change this when upgrading to -unstable kubeadm
 for f in os.listdir("."):
     if f.startswith("CLOUD_"):
 	this_kubeconfig = output_template.copy()
+	this_cluster = cluster_template.copy()
         kubeconfig = yaml.load(open(f+"/kubeconfig"))
         context_name = contexts[f] # ie london, frankfurt, america
         print f
@@ -49,6 +62,12 @@ for f in os.listdir("."):
         this_kubeconfig["contexts"].append(context)
         f = open("kubeconfigs/%s" % (context_name,), "w")
         f.write(yaml.dump(this_kubeconfig))
+        f.close()
+	this_cluster["metadata"]["name"] = context_name
+	this_cluster["spec"]["secretRef"] = context_name
+	this_cluster["spec"]["serverAddressByClientCIDRs"]["serverAddress"] = "https://%s:%d" % (master_ip, API_PORT)
+        f = open("configs/clusters/%s" % (context_name,), "w")
+        f.write(yaml.dump(this_cluster))
         f.close()
 f = open("kubeconfig", "w")
 f.write(yaml.dump(output))
