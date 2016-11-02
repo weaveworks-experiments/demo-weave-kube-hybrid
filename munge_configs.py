@@ -8,7 +8,7 @@ contexts = dict(
     CLOUD_FRANKFURT_AWS="frankfurt",
 )
 # template for desired kubeconfig output
-output = {
+output_template = {
     "kind": "Config",
     "apiVersion": "v1",
     "current-context": contexts.values()[-1],
@@ -16,9 +16,13 @@ output = {
     "users": [],
     "contexts": [],
 }
+output = output_template.copy()
+if not os.path.exists("kubeconfigs"):
+    os.makedirs("kubeconfigs")
 API_PORT = 443 # change this when upgrading to -unstable kubeadm
 for f in os.listdir("."):
     if f.startswith("CLOUD_"):
+	this_kubeconfig = output_template.copy()
         kubeconfig = yaml.load(open(f+"/kubeconfig"))
         context_name = contexts[f] # ie london, frankfurt, america
         print f
@@ -32,15 +36,21 @@ for f in os.listdir("."):
         del cluster["cluster"]["certificate-authority-data"]
         cluster["name"] = context_name
         output["clusters"].append(cluster)
+        this_kubeconfig["clusters"].append(cluster)
         # users
         user = kubeconfig["users"][0].copy()
         assert user["name"] == "admin", "unexpected username %s, expected admin" % (user["name"],)
         user["name"] = "admin-%s" % (context_name,)
         output["users"].append(user)
+        this_kubeconfig["users"].append(user)
         # contexts
         context = dict(context=dict(cluster=context_name, user="admin-%s" % (context_name,)), name=context_name)
         output["contexts"].append(context)
+        this_kubeconfig["contexts"].append(context)
+        f = open("kubeconfigs/%s" % (context_name,), "w")
+        f.write(yaml.dump(this_kubeconfig))
+        f.close()
 f = open("kubeconfig", "w")
 f.write(yaml.dump(output))
 f.close()
-print "Tada! Written output to kubeconfig. You may wish to:\n    cp kubeconfig ~/.kube/config"
+print "Tada! Written outputs to kubeconfig and kubeconfigs/*. You may wish to:\n    cp kubeconfig ~/.kube/config"

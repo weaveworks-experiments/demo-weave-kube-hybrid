@@ -140,6 +140,10 @@ kubectl --context=london --namespace=federation \
 The federated API server will use a NodePort on static port 30443 on all nodes in London with token auth.
 Now deploy federated API service and federated API/controller-manager deployments:
 ```
+$EDITOR config/deployments/federation-apiserver.yaml
+# Change 'cluster.world' to your own domain name that is under control of
+# google cloud DNS. XXX How is it going to authenticate to it??? TODO set
+# --dns-provider-config, and provide a correctly-configured file as a secret.
 kubectl --context=london apply -f config/services -f config/deployments
 ```
 
@@ -147,10 +151,11 @@ Remind ourselves of the token we created earlier:
 ```
 FEDERATION_CLUSTER_TOKEN=$(cut -d"," -f1 known-tokens.csv)
 ```
+
 Create a new kubectl context for it in our local kubeconfig (`~/.kube/config`):
 ```
 kubectl config set-cluster federation-cluster \
-  --server=https://$(cd CLUSTER_LONDON_DIGITALOCEAN; terraform output master_ip):30443 \
+  --server=https://$(cd CLOUD_LONDON_DIGITALOCEAN; terraform output master_ip):30443 \
   --insecure-skip-tls-verify=true
 kubectl config set-credentials federation-cluster \
   --token=${FEDERATION_CLUSTER_TOKEN}
