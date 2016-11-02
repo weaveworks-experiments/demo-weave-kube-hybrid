@@ -1,6 +1,6 @@
 #!/usr/bin/python
 print "finding kubeconfigs"
-import os, yaml, subprocess
+import os, yaml, subprocess, copy
 # short names for the clouds
 contexts = dict(
     CLOUD_LONDON_DIGITALOCEAN="london",
@@ -28,14 +28,14 @@ cluster_template = {
     "secretRef": {"name": ""}
   }
 }
-output = output_template.copy()
+output = copy.deepcopy(output_template)
 if not os.path.exists("kubeconfigs"):
     os.makedirs("kubeconfigs")
 API_PORT = 443 # change this when upgrading to -unstable kubeadm
 for f in os.listdir("."):
     if f.startswith("CLOUD_"):
-	this_kubeconfig = output_template.copy()
-	this_cluster = cluster_template.copy()
+	this_kubeconfig = copy.deepcopy(output_template)
+	this_cluster = copy.deepcopy(cluster_template)
         kubeconfig = yaml.load(open(f+"/kubeconfig"))
         context_name = contexts[f] # ie london, frankfurt, america
         print f
@@ -43,7 +43,7 @@ for f in os.listdir("."):
         master_ip = subprocess.check_output("cd %s; terraform output master_ip" % (f,), shell=True).strip()
         print master_ip
         # clusters
-        cluster = kubeconfig["clusters"][0].copy()
+        cluster = copy.deepcopy(kubeconfig["clusters"][0])
         cluster["cluster"]["server"] = "https://%s:%d" % (master_ip, API_PORT)
         cluster["cluster"]["insecure-skip-tls-verify"] = True
         del cluster["cluster"]["certificate-authority-data"]
@@ -51,7 +51,7 @@ for f in os.listdir("."):
         output["clusters"].append(cluster)
         this_kubeconfig["clusters"].append(cluster)
         # users
-        user = kubeconfig["users"][0].copy()
+        user = copy.deepcopy(kubeconfig["users"][0])
         assert user["name"] == "admin", "unexpected username %s, expected admin" % (user["name"],)
         user["name"] = "admin-%s" % (context_name,)
         output["users"].append(user)
