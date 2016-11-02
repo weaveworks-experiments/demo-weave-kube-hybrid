@@ -32,7 +32,7 @@ provider "aws" {
 
 # Key pair for the instances
 resource "aws_key_pair" "ssh-key" {
-  key_name = "k8s"
+  key_name = "k8s-ilya"
   public_key = "${var.k8s_ssh_key}"
 
   lifecycle {
