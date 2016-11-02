@@ -11,7 +11,6 @@ contexts = dict(
 output_template = {
     "kind": "Config",
     "apiVersion": "v1",
-    "current-context": contexts.values()[-1],
     "clusters": [],
     "users": [],
     "contexts": [],
