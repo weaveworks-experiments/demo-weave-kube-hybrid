@@ -17,16 +17,16 @@ output_template = {
     "contexts": [],
 }
 cluster_template = {
-    "apiVersion": "federation/v1beta1",
-    "kind": "Cluster",
-    "metadata": {"name": ""},
-    "spec": {
-      "serverAddressByClientCIDRs": [{
-	"clientCIDR": "0.0.0.0/0",
-	"serverAddress": "",
-      ]},
-      "secretRef": {"name": ""}
-    }
+  "apiVersion": "federation/v1beta1",
+  "kind": "Cluster",
+  "metadata": {"name": ""},
+  "spec": {
+    "serverAddressByClientCIDRs": [{
+      "clientCIDR": "0.0.0.0/0",
+      "serverAddress": "",
+    }],
+    "secretRef": {"name": ""}
+  }
 }
 output = output_template.copy()
 if not os.path.exists("kubeconfigs"):
@@ -65,8 +65,8 @@ for f in os.listdir("."):
         f.close()
 	this_cluster["metadata"]["name"] = context_name
 	this_cluster["spec"]["secretRef"] = context_name
-	this_cluster["spec"]["serverAddressByClientCIDRs"]["serverAddress"] = "https://%s:%d" % (master_ip, API_PORT)
-        f = open("configs/clusters/%s" % (context_name,), "w")
+	this_cluster["spec"]["serverAddressByClientCIDRs"][0]["serverAddress"] = "https://%s:%d" % (master_ip, API_PORT)
+        f = open("config/clusters/%s" % (context_name,), "w")
         f.write(yaml.dump(this_cluster))
         f.close()
 f = open("kubeconfig", "w")

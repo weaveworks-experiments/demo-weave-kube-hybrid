@@ -192,7 +192,6 @@ done
 kubectl --context=federation-cluster get clusters
 ```
 
-
 ### (5/5) Deploy app
 
 TODO
