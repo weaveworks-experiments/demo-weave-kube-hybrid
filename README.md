@@ -119,6 +119,7 @@ for X in CLOUD_*; do
      sudo chmod +x /usr/local/bin/weave")
 done
 ```
+
 Then run status:
 ```
 for X in CLOUD_*; do
@@ -187,6 +188,12 @@ kubectl --context="america" --namespace=federation \
 kubectl --context="america" \
   --namespace=federation \
   describe secrets federation-apiserver-kubeconfig
+```
+
+Wait for federation API server and controller manager to come up.
+Check by running:
+```
+kubectl --context=america --namespace=federation get pods
 ```
 
 Upload kubeconfigs of frankfurt and london to america as secrets.
