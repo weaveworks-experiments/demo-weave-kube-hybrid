@@ -143,8 +143,23 @@ Now deploy federated API service and federated API/controller-manager deployment
 kubectl --context=london apply -f config/services -f config/deployments
 ```
 
-Upload kubeconfigs of FRANKFURT and AMERICA to LONDON as secrets.
+Remind ourselves of the token we created earlier:
+```
+FEDERATION_CLUSTER_TOKEN=$(cut -d"," -f1 known-tokens.csv)
+```
+Create a new kubectl context for it in our local kubeconfig (`~/.kube/config`):
+```
+kubectl config set-credentials federation-cluster \
+  --token=${FEDERATION_CLUSTER_TOKEN}
+kubectl config set-context federation-cluster \
+  --cluster=federation-cluster \
+  --user=federation-cluster
+kubectl config use-context federation-cluster
+mkdir -p kubeconfigs
+kubectl config view --flatten --minify > kubeconfigs/federation-apiserver
+```
 
+Upload kubeconfigs of FRANKFURT and AMERICA to LONDON as secrets.
 ```
 kubectl mumble mumble federation namespace
 ```
