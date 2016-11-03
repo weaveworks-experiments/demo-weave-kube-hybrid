@@ -123,7 +123,7 @@ done
 
 The Kubernetes federation control plane will run in the federation namespace. Create the federation namespace using kubectl:
 ```
-kubectl --context=america apply -f config/ns/federation.yaml
+kubectl --context=america create namespace federation
 ```
 
 Configure a token for the federated API server:
