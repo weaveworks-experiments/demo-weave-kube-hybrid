@@ -1,12 +1,16 @@
 #!/usr/bin/python
+
 print "finding kubeconfigs"
+
 import os, yaml, subprocess, copy
+
 # short names for the clouds
 contexts = dict(
-    CLOUD_LONDON_DIGITALOCEAN="london",
-    CLOUD_AMERICA_GCE="america",
-    CLOUD_FRANKFURT_AWS="frankfurt",
+    tf_cluster_london="london",
+    tf_cluster_america="america",
+    tf_cluster_frankfurt="frankfurt",
 )
+
 # template for desired kubeconfig output
 output_template = {
     "kind": "Config",
@@ -15,6 +19,7 @@ output_template = {
     "users": [],
     "contexts": [],
 }
+
 cluster_template = {
   "apiVersion": "federation/v1beta1",
   "kind": "Cluster",
@@ -27,14 +32,17 @@ cluster_template = {
     "secretRef": {"name": ""}
   }
 }
+
+API_PORT = 443 # change this when upgrading to -unstable kubeadm
+
 output = copy.deepcopy(output_template)
+
 if not os.path.exists("kubeconfigs"):
     os.makedirs("kubeconfigs")
 if not os.path.exists("config/clusters"):
     os.makedirs("config/clusters")
-API_PORT = 443 # change this when upgrading to -unstable kubeadm
 for f in os.listdir("."):
-    if f.startswith("CLOUD_"):
+    if f.startswith("tf_cluster_"):
 	this_kubeconfig = copy.deepcopy(output_template)
 	this_cluster = copy.deepcopy(cluster_template)
         kubeconfig = yaml.load(open(f+"/kubeconfig"))
@@ -72,7 +80,9 @@ for f in os.listdir("."):
         f = open("config/clusters/%s.yaml" % (context_name,), "w")
         f.write(yaml.dump(this_cluster))
         f.close()
+
 f = open("kubeconfig", "w")
 f.write(yaml.dump(output))
 f.close()
+
 print "Tada! Written outputs to kubeconfig and kubeconfigs/*. You may wish to:\n    cp kubeconfig ~/.kube/config"

@@ -11,7 +11,7 @@ We'll spin up a federated cluster across DigitalOcean in London, AWS in Frankfur
 * Bash
 * Cloud provider credentials for GCE, AWS and DigitalOcean.
 
-Tested on OS X, should also work on Linux.
+Tested on macOS, should also work on Linux.
 
 ## Steps
 
@@ -19,24 +19,18 @@ Tested on OS X, should also work on Linux.
 
 Collect cloud credentials and insert them in `secrets`.
 
-```
+```shell
 ssh-keygen -f k8s-test
 cp secrets.template secrets && $EDITOR secrets
 ```
 
 Do GCE-specific setup:
-```
-source ./secrets && \
-   (cd CLOUD_AMERICA_GCE && \
-    gcloud config set project $TF_VAR_gce_project ; \
-    SA_EMAIL=$(gcloud iam service-accounts --format='value(email)' create k8s-terraform-ilya) && \
-    gcloud iam service-accounts keys create account.json --iam-account=$SA_EMAIL && \
-    PROJECT=$(gcloud config list core/project --format='value(core.project)') && \
-    gcloud projects add-iam-policy-binding $PROJECT --member serviceAccount:$SA_EMAIL --role roles/editor)
+```shell
+source ./secrets && ./tf_cluster_america/fetch_gce_secrets
 ```
 
 Set up a Google DNS Managed Zone (you'll need your own domain for this bit).
-```
+```shell
 gcloud dns managed-zones create federation \
   --description "Kubernetes federation testing" \
   --dns-name cluster.world
@@ -48,10 +42,10 @@ gcloud dns managed-zones create federation \
 
 In three terminal windows:
 
-```
-source ./secrets && (cd CLOUD_LONDON_DIGITALOCEAN && terraform apply)
-source ./secrets && (cd CLOUD_FRANKFURT_AWS && terraform apply)
-source ./secrets && (cd CLOUD_AMERICA_GCE && terraform apply)
+```shell
+source ./secrets && (cd tf_cluster_london && terraform apply)
+source ./secrets && (cd tf_cluster_frankfurt && terraform apply)
+source ./secrets && (cd tf_cluster_america && terraform apply)
 ```
 
 This should spit out IP addresses in `terraform output` for `master_ip`.
@@ -62,25 +56,24 @@ Wait a while for the clusters to come up. TODO maybe add scope here to watch the
 
 Get the kubeconfig files out:
 
-```
-for X in CLOUD_*; do
-  (cd $X && ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
-     sudo cat /etc/kubernetes/admin.conf > kubeconfig)
+```shell
+for X in london frankfurt america; do
+  ./ssh_master ${X} sudo cat /etc/kubernetes/admin.conf > tf_cluster_${X}/kubeconfig
 done
 ```
 
 Run the bundled `munge_configs.py` program to merge the kubeconfigs into one with multiple contexts:
-```
+```shell
 python munge_configs.py && cp kubeconfig ~/.kube/config
 ```
 
 You should now be able to enumerate your clusters:
-```
+```shell
 kubectl config get-contexts
 ```
 
 And list nodes in them:
-```
+```shell
 kubectl --context=london get nodes
 kubectl --context=frankfurt get nodes
 kubectl --context=america get nodes
@@ -91,40 +84,38 @@ kubectl --context=america get nodes
 The Weave routers will join up into a resilient hybrid cloud mesh network, given just a single meeting point IP.
 
 Set up the network on the federated control plane cluster (america) first:
-```
+```shell
 source ./secrets
 cat weave-kube-init.yaml | sed s/WEAVE_PASSWORD/$WEAVE_SECRET/ \
     | kubectl --context=america apply -f -
 ```
 Remember the IP of the master there. Note that this is only used for bootstrapping, once the Weave network has come up this will stop being a single point of failure.
-```
-export MEETING_POINT=$(cd CLOUD_AMERICA_GCE && terraform output master_ip)
+```shell
+export MEETING_POINT=$(cd tf_cluster_america && terraform output master_ip)
 ```
 
 Then join the other two locations up to the first cluster:
-```
+```shell
 source ./secrets
-for location in frankfurt london; do
+for X in london frankfurt; do
     cat weave-kube-join.yaml |sed s/MEETING_POINT/$MEETING_POINT/ \
         | sed s/WEAVE_PASSWORD/$WEAVE_SECRET/ \
-        | kubectl --context=$location apply -f -
+        | kubectl --context=${X} apply -f -
 done
 ```
 
-To check that the network came up across 3 clouds, first install the weave script on the hosts, for easy status-checking:
-```
-for X in CLOUD_*; do
-  (cd $X; ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
-    "sudo curl -s -L git.io/weave -o /usr/local/bin/weave && \
-     sudo chmod +x /usr/local/bin/weave")
+To check that the network came up across 3 clouds, first install the weave script on the hosts, for easy
+status-checking:
+```shell
+for X in london frankfurt america; do
+    ./ssh_master ${X} "sudo curl -s -L git.io/weave -o /usr/local/bin/weave && sudo chmod +x /usr/local/bin/weave"
 done
 ```
 
 Then run status:
-```
-for X in CLOUD_*; do
-  (cd $X; ssh -i ../k8s-test $(cat username)@$(terraform output master_ip) \
-    "sudo weave status")
+```shell
+for X in london frankfurt america; do
+  ./ssh_master ${X} sudo weave status
 done
 ```
 
@@ -168,7 +159,7 @@ FEDERATION_CLUSTER_TOKEN=$(cut -d"," -f1 known-tokens.csv)
 Create a new kubectl context for it in our local kubeconfig (`~/.kube/config`):
 ```
 kubectl config set-cluster federation-cluster \
-  --server=https://$(cd CLOUD_AMERICA_GCE; terraform output master_ip):30443 \
+  --server=https://$(cd tf_cluster_america; terraform output master_ip):30443 \
   --insecure-skip-tls-verify=true
 kubectl config set-credentials federation-cluster \
   --token=${FEDERATION_CLUSTER_TOKEN}
@@ -200,8 +191,8 @@ Upload kubeconfigs of frankfurt and london to america as secrets.
 
 ```
 for X in london frankfurt; do
-  kubectl --context=america --namespace=federation create secret generic $X --from-file=kubeconfigs/$X/kubeconfig
-  kubectl --context=federation-cluster create -f config/clusters/$X.yaml
+  kubectl --context=america --namespace=federation create secret generic ${X} --from-file=kubeconfigs/${X}/kubeconfig
+  kubectl --context=federation-cluster create -f config/clusters/${X}.yaml
 done
 ```
 
@@ -226,8 +217,8 @@ Aronchick wanted to show a rolling upgrade, can we do that with flux?
 ### Destroying everything
 
 ```
-for X in CLOUD_*; do
-  (cd $X; terraform destroy -force)
+for X in london frankfurt america; do
+  (cd tf_cluster_${X}; terraform destroy -force)
 done
 ```
 
