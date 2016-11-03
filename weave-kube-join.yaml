@@ -27,6 +27,7 @@ spec:
           # branch with:
           # IMAGE_VERSION=disable-npc-1.7.2 WEAVE_VERSION=1.7.2 ./build.sh
           image: lmarsden/weave-kube:disable-npc-1.7.2
+          imagePullPolicy: Always
           command:
             - /home/weave/launch.sh
             - --password=WEAVE_PASSWORD
