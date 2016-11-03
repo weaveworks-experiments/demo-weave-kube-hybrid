@@ -202,6 +202,14 @@ kubectl --context=federation-cluster get clusters
 
 ### (5/5) Deploy app
 
+```shell
+WEAVE_CLOUD_TOKEN=<insert_your_token_here>
+for X in london frankfurt america; do
+  kubectl --context=${X} --namespace=kube-system create -f \
+    "http://frontend.dev.weave.works/k8s/scope.json?t=${WEAVE_CLOUD_TOKEN}"
+done
+```
+
 TODO
 
 Deploy socks shop to federation apiserver, tweaked to show where it's being served from.
@@ -213,6 +221,7 @@ Can all components register in DNS using their Weave IPs??
 So that front-end in one cloud can securely talk to orders-service in another, for example?
 
 Aronchick wanted to show a rolling upgrade, can we do that with flux?
+
 
 ### Destroying everything
 
