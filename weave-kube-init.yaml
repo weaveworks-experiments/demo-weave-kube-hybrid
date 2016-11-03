@@ -23,7 +23,10 @@ spec:
       hostPID: true
       containers:
         - name: weave
-          image: weaveworks/weave-kube:1.7.2
+          # Built from github.com/lukemarsden/weave-kube disable-npc-1.7.2
+          # branch with:
+          # IMAGE_VERSION=disable-npc-1.7.2 WEAVE_VERSION=1.7.2 ./build.sh
+          image: lmarsden/weave-kube:disable-npc-1.7.2
           command:
             - /home/weave/launch.sh
             - --password=WEAVE_PASSWORD
@@ -47,13 +50,6 @@ spec:
           resources:
             requests:
               cpu: 10m
-        - name: weave-npc
-          image: weaveworks/weave-npc:1.7.2
-          resources:
-            requests:
-              cpu: 10m
-          securityContext:
-            privileged: true
       restartPolicy: Always
       volumes:
         - name: weavedb
