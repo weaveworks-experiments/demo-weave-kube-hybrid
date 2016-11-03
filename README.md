@@ -202,6 +202,12 @@ kubectl --context=federation-cluster get clusters
 
 ### (5/5) Deploy app
 
+First, we are going to create PostgreSQL master and replicas. Master will run london,
+and replicas will run in both datacenters. We will use Weave Cloud to monitor connectivity
+between master and the replicas.
+
+Install Weave Scope agent with a token for Weave Cloud:
+
 ```shell
 WEAVE_CLOUD_TOKEN=<insert_your_token_here>
 for X in london frankfurt america; do
@@ -210,7 +216,44 @@ for X in london frankfurt america; do
 done
 ```
 
-TODO
+Deploy PostgreSQL master
+```shell
+kubectl --context=federated-cluster create -f psql/master.yaml
+```
+
+Now wait for the pod to become ready:
+```shell
+kubectl --context=london get pods --selector name=psql-master
+```
+
+Get pod IP:
+```shell
+PSQL_MASTER_IP="$(kubectl --context=london get pods --selector name=psql-master --output=template --template='{{range .items}}{{.status.podIP}}{{end}}')"
+```
+
+Next, create replicas:
+```
+sed s/INSERT_MASTER_POD_IP/$PSQL_MASTER_IP/ psql/replica.yaml | kubectl --context=federated-cluster create -f -
+```
+
+If you take a look at `psql/replica.yaml`, you will see that we are told Kubernetes to run up to 4 replicas in cluster frankfurt
+and up to 2 replicas in cluster london. We can confirm this by running `kubectl` agains each of the clusters like this:
+```console
+wroom:demo-weave-kube-hybrid ilya$ kubectl --context london get rs
+NAME           DESIRED   CURRENT   READY     AGE
+psql-master    1         1         1         11m
+psql-replica   2         2         2         1m
+wroom:demo-weave-kube-hybrid ilya$ kubectl --context frankfurt get rs
+NAME           DESIRED   CURRENT   READY     AGE
+psql-replica   4         4         4         1m
+wroom:demo-weave-kube-hybrid ilya$ 
+```
+
+We can also see this in Weave Cloud graph view, as shown in the screenshot below.
+
+![Screenshot of Weave Cloud](https://www.dropbox.com/s/z1bd2bik0s03eab/Screenshot%202016-11-03%2018.43.44.png?dl=1)
+
+### TODO
 
 Deploy socks shop to federation apiserver, tweaked to show where it's being served from.
 

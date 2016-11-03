@@ -3,7 +3,7 @@ kind: ReplicaSet
 metadata:
   name: nginx-us
   annotations:
-    federation.kubernetes.io/replica-set-preferences: |
+    "federation.kubernetes.io/replica-set-preferences": |
         {
             "rebalance": true,
             "clusters": {
