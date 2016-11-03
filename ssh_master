@@ -1,0 +1,20 @@
+#!/bin/bash -ex
+
+[ "$#" -ge 1 ] || exit 1
+
+master_ip="$(cd "tf_cluster_${1}" && terraform output master_ip)"
+username="$(cat "tf_cluster_${1}/username")"
+
+shift
+
+ssh \
+  -o Compression=yes \
+  -o LogLevel=FATAL \
+  -o StrictHostKeyChecking=no \
+  -o UserKnownHostsFile=/dev/null \
+  -o IdentitiesOnly=yes \
+  -o ForwardAgent=yes \
+  -i k8s-test \
+  -l "${username}" \
+    "${master_ip}" \
+      "$@"
