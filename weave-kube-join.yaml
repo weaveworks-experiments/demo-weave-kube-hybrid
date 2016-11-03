@@ -33,6 +33,9 @@ spec:
             - --password=WEAVE_PASSWORD
             - --ipalloc-init=observer
             - MEETING_POINT
+          env:
+            - name: EXPECT_NPC
+              value: "0"
           livenessProbe:
             initialDelaySeconds: 30
             httpGet:

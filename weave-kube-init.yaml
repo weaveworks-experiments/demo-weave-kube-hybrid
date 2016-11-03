@@ -31,6 +31,9 @@ spec:
           command:
             - /home/weave/launch.sh
             - --password=WEAVE_PASSWORD
+          env:
+            - name: EXPECT_NPC
+              value: "0"
           livenessProbe:
             initialDelaySeconds: 30
             httpGet:
