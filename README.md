@@ -247,7 +247,24 @@ wroom:demo-weave-kube-hybrid ilya$
 
 We can also see this in Weave Cloud graph view, as shown in the screenshot below.
 
-![Screenshot of Weave Cloud](https://www.dropbox.com/s/z1bd2bik0s03eab/Screenshot%202016-11-03%2018.43.44.png?dl=1)
+![Screenshot of Weave Cloud](https://www.dropbox.com/s/2wwwpmfddgomd5a/0_database_pods.png?dl=1)
+
+We can use Weave Clould to attach to any of the containers, let's login to PostgreSQL master pod and start `psql`.
+
+![Select DB master pod](https://www.dropbox.com/s/6t67mojjnn0rybc/1_find_master_pod.png?dl=1)
+
+![Attach to 'server' container in DB master pod](https://www.dropbox.com/s/dz5ivpdiahfcsee/2_open_a_shell.png?dl=1)
+
+![Create 'federation' database](https://www.dropbox.com/s/8kis95zixm9ifoa/3_create_federation_db_on_master.png?dl=1)
+
+![Insert some rows into table 'hello'](https://www.dropbox.com/s/fr9ei4mddma4dyg/4_insert_data.png?dl=1)
+
+![Select a pod](https://www.dropbox.com/s/x538vqcdt7hxd8e/6_select_one_of_replica_pods.png?dl=1)
+
+![Pick the 'server' container](https://www.dropbox.com/s/fdxvrol6z4cs1rl/7_select_container_in_replica_pod.png?dl=1)
+
+![Read the data!](https://www.dropbox.com/s/qz9w44hbcmvis3w/8_open_shell_and_query_the_db.png?dl=1)
+
 
 ### Destroying everything
 
