@@ -214,7 +214,7 @@ done
 
 Deploy PostgreSQL master
 ```shell
-kubectl --context=federated-cluster create -f psql/master.yaml
+kubectl --context=federation-cluster create -f psql/master.yaml
 ```
 
 Now wait for the pod to become ready:
@@ -229,7 +229,7 @@ PSQL_MASTER_IP="$(kubectl --context=london get pods --selector name=psql-master 
 
 Next, create replicas:
 ```shell
-sed s/INSERT_MASTER_POD_IP/$PSQL_MASTER_IP/ psql/replica.yaml | kubectl --context=federated-cluster create -f -
+sed s/INSERT_MASTER_POD_IP/$PSQL_MASTER_IP/ psql/replica.yaml | kubectl --context=federation-cluster create -f -
 ```
 
 If you take a look at `psql/replica.yaml`, you will see that we are told Kubernetes to run up to 4 replicas in cluster frankfurt
