@@ -120,12 +120,12 @@ done
 ### (4/5) Set up control plane
 
 The Kubernetes federation control plane will run in the federation namespace. Create the federation namespace using kubectl:
-```
+```shell
 kubectl --context=america create namespace federation
 ```
 
 Configure a token for the federated API server:
-```
+```shell
 echo "$(python -c \
         'import random; print "%0x" % (random.SystemRandom().getrandbits(16*8),)' \
        ),admin,admin" > known-tokens.csv
@@ -133,7 +133,7 @@ echo "$(python -c \
 
 Save `known-tokens.csv` in Kubernetes secret in federated control plane:
 
-```
+```shell
 kubectl --context=america --namespace=federation \
     create secret generic federation-apiserver-secrets --from-file=known-tokens.csv
 kubectl --context=america --namespace=federation \
@@ -142,7 +142,7 @@ kubectl --context=america --namespace=federation \
 
 The federated API server will use a NodePort on static port 30443 on all nodes in America with token auth.
 Now deploy federated API service and federated API/controller-manager deployments:
-```
+```shell
 $EDITOR config/deployments/federation-controller-manager.yaml
 # Change 'cluster.world' to your own domain name that is under control of
 # google cloud DNS.
@@ -150,12 +150,12 @@ kubectl --context=america apply -f config/services -f config/deployments
 ```
 
 Remind ourselves of the token we created earlier:
-```
+```shell
 FEDERATION_CLUSTER_TOKEN=$(cut -d"," -f1 known-tokens.csv)
 ```
 
 Create a new kubectl context for it in our local kubeconfig (`~/.kube/config`):
-```
+```shell
 kubectl config set-cluster federation-cluster \
     --server=https://$(cd tf_cluster_america; terraform output master_ip):30443 \
     --insecure-skip-tls-verify=true
@@ -170,7 +170,7 @@ kubectl config view --flatten --minify > kubeconfigs/federation-apiserver/kubeco
 ```
 
 Create a secret for the federation control plane's kubeconfig:
-```
+```shell
 kubectl --context="america" --namespace=federation \
     create secret generic federation-apiserver-kubeconfig \
     --from-file=kubeconfigs/federation-apiserver/kubeconfig
@@ -181,19 +181,19 @@ kubectl --context="america" \
 
 Wait for federation API server and controller manager to come up.
 Check by running:
-```
+```shell
 kubectl --context=america --namespace=federation get pods
 ```
 
 Upload kubeconfigs of frankfurt and london to america as secrets.
-```
+```shell
 for X in london frankfurt; do
     kubectl --context=america --namespace=federation create secret generic ${X} --from-file=kubeconfigs/${X}/kubeconfig
     kubectl --context=federation-cluster create -f config/clusters/${X}.yaml
 done
 ```
 To see when both clusters are ready, run:
-```
+```shell
 kubectl --context=federation-cluster get clusters
 ```
 
