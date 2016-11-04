@@ -26,7 +26,7 @@ spec:
           - --master=https://federation-apiserver:443
           - --dns-provider=google-clouddns
           - --federation-name=federation
-          - --zone-name=ilya.cluster.world.
+          - --zone-name=cluster.world. # CHANGEME!
           - --v=2
         volumeMounts:
         - name: ssl
