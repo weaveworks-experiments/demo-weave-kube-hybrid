@@ -252,6 +252,7 @@ We can also see this in Weave Cloud graph view, as shown in the screenshot below
 ### Destroying everything
 
 ```shell
+source secrets
 for X in london frankfurt america; do
     (cd tf_cluster_${X}; terraform destroy -force)
 done
