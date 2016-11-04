@@ -32,8 +32,8 @@ source ./secrets && ./tf_cluster_america/fetch_gce_secrets
 Set up a Google DNS Managed Zone (you'll need your own domain for this bit).
 ```shell
 gcloud dns managed-zones create federation \
-  --description "Kubernetes federation testing" \
-  --dns-name cluster.world
+    --description "Kubernetes federation testing" \
+    --dns-name cluster.world
 ```
 
 ### (2/5) Use Terraform to create some clusters
@@ -56,7 +56,7 @@ Get the kubeconfig files out:
 
 ```shell
 for X in london frankfurt america; do
-  ./ssh_master ${X} sudo cat /etc/kubernetes/admin.conf > tf_cluster_${X}/kubeconfig
+    ./ssh_master ${X} sudo cat /etc/kubernetes/admin.conf > tf_cluster_${X}/kubeconfig
 done
 ```
 
@@ -113,7 +113,7 @@ done
 Then run status:
 ```shell
 for X in london frankfurt america; do
-  ./ssh_master ${X} sudo weave status
+    ./ssh_master ${X} sudo weave status
 done
 ```
 
@@ -135,9 +135,9 @@ Save `known-tokens.csv` in Kubernetes secret in federated control plane:
 
 ```
 kubectl --context=america --namespace=federation \
-  create secret generic federation-apiserver-secrets --from-file=known-tokens.csv
+    create secret generic federation-apiserver-secrets --from-file=known-tokens.csv
 kubectl --context=america --namespace=federation \
-  describe secrets federation-apiserver-secrets
+    describe secrets federation-apiserver-secrets
 ```
 
 The federated API server will use a NodePort on static port 30443 on all nodes in America with token auth.
@@ -157,13 +157,13 @@ FEDERATION_CLUSTER_TOKEN=$(cut -d"," -f1 known-tokens.csv)
 Create a new kubectl context for it in our local kubeconfig (`~/.kube/config`):
 ```
 kubectl config set-cluster federation-cluster \
-  --server=https://$(cd tf_cluster_america; terraform output master_ip):30443 \
-  --insecure-skip-tls-verify=true
+    --server=https://$(cd tf_cluster_america; terraform output master_ip):30443 \
+    --insecure-skip-tls-verify=true
 kubectl config set-credentials federation-cluster \
-  --token=${FEDERATION_CLUSTER_TOKEN}
+    --token=${FEDERATION_CLUSTER_TOKEN}
 kubectl config set-context federation-cluster \
-  --cluster=federation-cluster \
-  --user=federation-cluster
+    --cluster=federation-cluster \
+    --user=federation-cluster
 kubectl config use-context federation-cluster
 mkdir -p kubeconfigs/federation-apiserver
 kubectl config view --flatten --minify > kubeconfigs/federation-apiserver/kubeconfig
@@ -172,11 +172,11 @@ kubectl config view --flatten --minify > kubeconfigs/federation-apiserver/kubeco
 Create a secret for the federation control plane's kubeconfig:
 ```
 kubectl --context="america" --namespace=federation \
-  create secret generic federation-apiserver-kubeconfig \
-  --from-file=kubeconfigs/federation-apiserver/kubeconfig
+    create secret generic federation-apiserver-kubeconfig \
+    --from-file=kubeconfigs/federation-apiserver/kubeconfig
 kubectl --context="america" \
-  --namespace=federation \
-  describe secrets federation-apiserver-kubeconfig
+    --namespace=federation \
+    describe secrets federation-apiserver-kubeconfig
 ```
 
 Wait for federation API server and controller manager to come up.
@@ -188,8 +188,8 @@ kubectl --context=america --namespace=federation get pods
 Upload kubeconfigs of frankfurt and london to america as secrets.
 ```
 for X in london frankfurt; do
-  kubectl --context=america --namespace=federation create secret generic ${X} --from-file=kubeconfigs/${X}/kubeconfig
-  kubectl --context=federation-cluster create -f config/clusters/${X}.yaml
+    kubectl --context=america --namespace=federation create secret generic ${X} --from-file=kubeconfigs/${X}/kubeconfig
+    kubectl --context=federation-cluster create -f config/clusters/${X}.yaml
 done
 ```
 To see when both clusters are ready, run:
@@ -207,8 +207,8 @@ Install Weave Scope agent with a token for [Weave Cloud](https://cloud.weave.wor
 ```shell
 WEAVE_CLOUD_TOKEN=<insert_your_token_here>
 for X in london frankfurt america; do
-  kubectl --context=${X} --namespace=kube-system create -f \
-    "http://frontend.dev.weave.works/k8s/scope.json?t=${WEAVE_CLOUD_TOKEN}"
+    kubectl --context=${X} --namespace=kube-system create -f \
+        "http://frontend.dev.weave.works/k8s/scope.json?t=${WEAVE_CLOUD_TOKEN}"
 done
 ```
 
@@ -253,6 +253,6 @@ We can also see this in Weave Cloud graph view, as shown in the screenshot below
 
 ```shell
 for X in london frankfurt america; do
-  (cd tf_cluster_${X}; terraform destroy -force)
+    (cd tf_cluster_${X}; terraform destroy -force)
 done
 ```
