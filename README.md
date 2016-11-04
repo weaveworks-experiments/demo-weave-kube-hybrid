@@ -36,9 +36,7 @@ gcloud dns managed-zones create federation \
   --dns-name cluster.world
 ```
 
-(Note to self: `https://www.googleapis.com/dns/v1/projects/k8s-demos-142718/managedZones/federation`)
-
-### (2/5) Use terraform to create some clusters
+### (2/5) Use Terraform to create some clusters
 
 In three terminal windows:
 
@@ -50,7 +48,7 @@ source ./secrets && (cd tf_cluster_america && terraform apply)
 
 This should spit out IP addresses in `terraform output` for `master_ip`.
 
-Wait a while for the clusters to come up. TODO maybe add scope here to watch them come up?
+Wait a while for the clusters to come up.
 
 **You'll only need one terminal window for the rest of these instructions.**
 
@@ -130,10 +128,10 @@ Configure a token for the federated API server:
 ```
 echo "$(python -c \
         'import random; print "%0x" % (random.SystemRandom().getrandbits(16*8),)' \
-       ),admin,admin"  > known-tokens.csv
+       ),admin,admin" > known-tokens.csv
 ```
 
-Save known-tokens.csv in Kubernetes secret in federated control plane:
+Save `known-tokens.csv` in Kubernetes secret in federated control plane:
 
 ```
 kubectl --context=america --namespace=federation \
@@ -188,26 +186,24 @@ kubectl --context=america --namespace=federation get pods
 ```
 
 Upload kubeconfigs of frankfurt and london to america as secrets.
-
 ```
 for X in london frankfurt; do
   kubectl --context=america --namespace=federation create secret generic ${X} --from-file=kubeconfigs/${X}/kubeconfig
   kubectl --context=federation-cluster create -f config/clusters/${X}.yaml
 done
 ```
-
+To see when both clusters are ready, run:
 ```
 kubectl --context=federation-cluster get clusters
 ```
 
-### (5/5) Deploy app
+### (5/5) Deploy a database with cross-datacenter replication
 
-First, we are going to create PostgreSQL master and replicas. Master will run london,
+First, we are going to create PostgreSQL master and replicas. Master will run in london datacenter,
 and replicas will run in both datacenters. We will use Weave Cloud to monitor connectivity
 between master and the replicas.
 
-Install Weave Scope agent with a token for Weave Cloud:
-
+Install Weave Scope agent with a token for [Weave Cloud](https://cloud.weave.works):
 ```shell
 WEAVE_CLOUD_TOKEN=<insert_your_token_here>
 for X in london frankfurt america; do
@@ -232,7 +228,7 @@ PSQL_MASTER_IP="$(kubectl --context=london get pods --selector name=psql-master 
 ```
 
 Next, create replicas:
-```
+```shell
 sed s/INSERT_MASTER_POD_IP/$PSQL_MASTER_IP/ psql/replica.yaml | kubectl --context=federated-cluster create -f -
 ```
 
@@ -253,51 +249,10 @@ We can also see this in Weave Cloud graph view, as shown in the screenshot below
 
 ![Screenshot of Weave Cloud](https://www.dropbox.com/s/z1bd2bik0s03eab/Screenshot%202016-11-03%2018.43.44.png?dl=1)
 
-### TODO
-
-Deploy socks shop to federation apiserver, tweaked to show where it's being served from.
-
-Stateless components & caches can go everywhere.
-Only stateful components (ie basket) need to do high-latency hop.
-
-Can all components register in DNS using their Weave IPs??
-So that front-end in one cloud can securely talk to orders-service in another, for example?
-
-Aronchick wanted to show a rolling upgrade, can we do that with flux?
-
-
 ### Destroying everything
 
-```
+```shell
 for X in london frankfurt america; do
   (cd tf_cluster_${X}; terraform destroy -force)
 done
 ```
-
-## Notes
-
-See also 'Transforming Infrastructure with Containers & Kubernetes' slides.
-
-* Slide 32 (setting up kubeadm & overlay network)
-    * Here's how easy it is to set up a master
-    * Here's how easy it is to add a node
-    * And a second node
-    * and 15 more nodes - for i in `seq 1 15`; do; ssh node-$i "kubeadm join --token <foo> --master=10.10.19.13" ; done;
-    * Deploy weave net
-* Slide 43-65
-    * Log into a cluster (GKE)
-    * Create a federation
-    * Log into second cluster (AWS)
-    * Join federation
-    * Deploy an app across all clusters
-    * Deploy a service across all clusters
-    * kubectl get pods - show in all clusters
-    * <new window> while true; curl http://federated-ingress-endpoint/gimme-your-ip; end
-    * Show IPs going across clusters
-    * Deploy rolling update across clusters
-    * Show curl starting to update across all clusters
-* Slide 67
-    * Install helm
-    * Show text for chart
-    * Install app (mariadb? mysql?)
-    * Maybe that's it?
