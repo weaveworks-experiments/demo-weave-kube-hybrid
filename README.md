@@ -197,7 +197,65 @@ To see when both clusters are ready, run:
 kubectl --context=federation-cluster get clusters
 ```
 
-### (5/5) Deploy a database with cross-datacenter replication
+### (5/5) Demo App with replicated DB
+
+#### Create cross-region PostrgreSQL deployment using Helm
+
+[Download](https://github.com/kubernetes/helm#install) & install Helm on each of the clusters:
+```
+helm init --kube-context london
+helm init --kube-context frankfurt
+```
+
+Deploy PostgreSQL master DB in london:
+```
+helm install --kube-context london charts/psql-master
+```
+
+Get master DB IP:
+```
+masterPodIP="$(kubectl --context=london get pods --selector psql=master --output=template --template='{{range .items}}{{.status.podIP}}{{end}}')"
+```
+
+Deploy DB replicas in frankfurt and connect to master:
+```
+helm --kube-context frankfurt --set masterPodIP="${masterPodIP}" install charts/psql-replica
+```
+
+#### Configure the DNS.
+
+> We are going to configure the DNS manually here. Fenderation support for global ingress is something we would like to
+> show, but we haven't managed to make it work yet.
+
+For the purpose of the demo as shown in the video we have configured an A-record for `hello.cluster.world` in Amazon Route53 with weighted routing policy (for simple round-robin behaviour). We have pointed this record at all node IPs for london and frankfurt clusters.
+
+
+Deploy blue version of the app:
+```
+kubectl apply -f app/demo-app-rc-blue.yaml
+```
+
+Now hit `hello.cluster.world:3000` to see it. Refresh a few times, and you will see that pages load from different
+countiers where the two clusters are deployed.
+
+Federation doesn't support deployments right now, so we will do a manual rollout of green version.
+
+Deploy green version:
+```
+kubectl apply -f app/demo-app-rc-green.yaml
+```
+
+Now hit `hello.cluster.world:3000` a few times to see both versions alternate.
+
+Scale down blue version:
+```
+kubectl scale rs demo-app-blue --replicas=0
+```
+
+If you keep reloading the app page, you will notice tha only green version is available now.
+
+
+### Using Weave Cloud for functional testing of database replication
 
 First, we are going to create PostgreSQL master and replicas. Master will run in london datacenter,
 and replicas will run in both datacenters. We will use Weave Cloud to monitor connectivity
@@ -265,22 +323,6 @@ We can use Weave Clould to attach to any of the containers, let's login to Postg
 
 ![Read the data!](https://www.dropbox.com/s/qz9w44hbcmvis3w/8_open_shell_and_query_the_db.png?dl=1)
 
-
-### Helm Demo
-
-```
-helm init --kube-context london
-helm init --kube-context frankfurt
-```
-
-```
-helm install --kube-context london charts/psql-master
-```
-
-```
-masterPodIP="$(kubectl --context=london get pods --selector psql=master --output=template --template='{{range .items}}{{.status.podIP}}{{end}}')"
-helm --kube-context frankfurt --set masterPodIP="${masterPodIP}" install charts/psql-replica
-```
 
 ### Destroying everything
 
