@@ -255,7 +255,7 @@ kubectl scale rs demo-app-blue --replicas=0
 If you keep reloading the app page, you will notice tha only green version is available now.
 
 
-### Using Weave Cloud for functional testing of database replication
+## Using Weave Cloud for functional testing of database replication
 
 First, we are going to create PostgreSQL master and replicas. Master will run in london datacenter,
 and replicas will run in both datacenters. We will use Weave Cloud to monitor connectivity
@@ -324,7 +324,7 @@ We can use Weave Clould to attach to any of the containers, let's login to Postg
 ![Read the data!](https://www.dropbox.com/s/qz9w44hbcmvis3w/8_open_shell_and_query_the_db.png?dl=1)
 
 
-### Destroying everything
+## Destroying everything
 
 ```shell
 source secrets
