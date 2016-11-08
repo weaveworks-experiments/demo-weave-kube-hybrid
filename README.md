@@ -266,6 +266,22 @@ We can use Weave Clould to attach to any of the containers, let's login to Postg
 ![Read the data!](https://www.dropbox.com/s/qz9w44hbcmvis3w/8_open_shell_and_query_the_db.png?dl=1)
 
 
+### Helm Demo
+
+```
+helm init --kube-context london
+helm init --kube-context frankfurt
+```
+
+```
+helm install --kube-context london charts/psql-master
+```
+
+```
+masterPodIP="$(kubectl --context=london get pods --selector psql=master --output=template --template='{{range .items}}{{.status.podIP}}{{end}}')"
+helm --kube-context frankfurt --set masterPodIP="${masterPodIP}" install charts/psql-replica
+```
+
 ### Destroying everything
 
 ```shell
