@@ -33,7 +33,7 @@ cluster_template = {
   }
 }
 
-API_PORT = 443 # change this when upgrading to -unstable kubeadm
+API_PORT = 6443 # change this when upgrading to -unstable kubeadm
 
 output = copy.deepcopy(output_template)
 
