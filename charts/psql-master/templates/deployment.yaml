@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+        psql: master
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+        env:
+        - name: PGHOST
+          value: /tmp
+        - name: PG_MODE
+          value: master
+        - name: PG_MASTER_USER
+          value: master
+        - name: PG_MASTER_PASSWORD
+          value: password
+        - name: PG_USER
+          value: testuser
+        - name: PG_PASSWORD
+          value: password
+        - name: PG_DATABASE
+          value: userdb
+        - name: PG_ROOT_PASSWORD
+          value: password
+        volumeMounts:
+        - mountPath: /pgdata
+          name: pgdata
+        - mountPath: /backup
+          name: backup
+          readOnly: true
+      volumes:
+      - emptyDir: {}
+        name: pgdata
+      - emptyDir: {}
+        name: backup
