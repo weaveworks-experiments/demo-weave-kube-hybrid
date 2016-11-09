@@ -266,7 +266,7 @@ Install Weave Scope agent with a token for [Weave Cloud](https://cloud.weave.wor
 WEAVE_CLOUD_TOKEN=<insert_your_token_here>
 for X in london frankfurt america; do
     kubectl --context=${X} --namespace=kube-system create -f \
-        "http://frontend.dev.weave.works/k8s/scope.json?t=${WEAVE_CLOUD_TOKEN}"
+        "https://cloud.weave.works/k8s/scope.json?t=${WEAVE_CLOUD_TOKEN}"
 done
 ```
 
